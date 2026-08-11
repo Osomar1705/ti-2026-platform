@@ -1,0 +1,43 @@
+import type { Team, Player } from '../types'
+
+export const teams: Team[] = [
+  { id: 'ts', name: 'Team Spirit', short: 'TS', color: '#cf4b45', seed: 1, region: 'CIS' },
+  { id: 'te', name: 'Tundra Esports', short: 'TE', color: '#b69a66', seed: 2, region: 'WEU' },
+  { id: 'tl', name: 'Team Liquid', short: 'TL', color: '#7d94b5', seed: 3, region: 'WEU' },
+  { id: 'gg', name: 'Gaimin Gladiators', short: 'GG', color: '#a978b7', seed: 4, region: 'WEU' },
+  { id: 'ng', name: 'Nigma Galaxy', short: 'NG', color: '#d3a959', seed: 5, region: 'WEU' },
+  { id: 'au', name: 'Aurora', short: 'AU', color: '#729b9c', seed: 6, region: 'SEA' },
+]
+
+export const players: Player[] = [
+  { id: 'yatoro', name: 'Yatoro', teamId: 'ts', role: 'carry', country: 'UA', rating: 9.4 },
+  { id: 'collapse', name: 'Collapse', teamId: 'ts', role: 'offlane', country: 'UA', rating: 9.2 },
+  { id: 'torontotokyo', name: 'TORONTOTOKYO', teamId: 'ts', role: 'mid', country: 'RU', rating: 9.1 },
+  { id: 'mira', name: 'Mira', teamId: 'ts', role: 'support', country: 'UA', rating: 8.8 },
+  { id: 'miroslaw', name: 'Miroslaw', teamId: 'ts', role: 'hard-support', country: 'RU', rating: 8.6 },
+  { id: '33', name: '33', teamId: 'te', role: 'offlane', country: 'NO', rating: 9.0 },
+  { id: 'skiter', name: 'Skiter', teamId: 'te', role: 'carry', country: 'RO', rating: 8.9 },
+  { id: 'nine', name: 'Nine', teamId: 'te', role: 'mid', country: 'AT', rating: 8.8 },
+  { id: 'saksa', name: 'Saksa', teamId: 'te', role: 'support', country: 'EE', rating: 8.7 },
+  { id: 'sneyking', name: 'Sneyking', teamId: 'te', role: 'hard-support', country: 'CA', rating: 8.6 },
+  { id: 'micke', name: 'miCKe', teamId: 'tl', role: 'carry', country: 'SE', rating: 9.1 },
+  { id: 'nisha', name: 'Nisha', teamId: 'tl', role: 'mid', country: 'PK', rating: 9.2 },
+  { id: 'boxi', name: 'Boxi', teamId: 'tl', role: 'offlane', country: 'SE', rating: 8.7 },
+  { id: 'zai', name: 'zai', teamId: 'tl', role: 'support', country: 'SE', rating: 8.9 },
+  { id: 'insania', name: 'Insania', teamId: 'tl', role: 'hard-support', country: 'SE', rating: 8.8 },
+  { id: 'quinn', name: 'Quinn', teamId: 'gg', role: 'carry', country: 'CA', rating: 8.9 },
+  { id: 'ace', name: 'Ace', teamId: 'gg', role: 'offlane', country: 'SE', rating: 8.8 },
+  { id: 'seleri', name: 'Seleri', teamId: 'gg', role: 'mid', country: 'SE', rating: 8.6 },
+  { id: 'tofu', name: 'tOfu', teamId: 'gg', role: 'support', country: 'AU', rating: 8.5 },
+  { id: 'puck', name: 'Puck', teamId: 'gg', role: 'hard-support', country: 'SE', rating: 8.4 },
+  { id: 'w33', name: 'w33', teamId: 'ng', role: 'mid', country: 'JO', rating: 9.0 },
+  { id: 'iltw', name: 'iLTW', teamId: 'ng', role: 'carry', country: 'UA', rating: 8.8 },
+  { id: 'miracle', name: 'Miracle-', teamId: 'ng', role: 'offlane', country: 'JO', rating: 9.3 },
+  { id: 'kuroky', name: 'KuroKy', teamId: 'ng', role: 'hard-support', country: 'DE', rating: 8.9 },
+  { id: 'gh', name: 'GH', teamId: 'ng', role: 'support', country: 'JO', rating: 9.0 },
+  { id: 'superposition', name: 'Superposition', teamId: 'au', role: 'carry', country: 'MY', rating: 8.5 },
+  { id: 'saberlight', name: 'SabeRLight-', teamId: 'au', role: 'mid', country: 'PH', rating: 8.4 },
+  { id: 'raddan', name: 'Raddan', teamId: 'au', role: 'offlane', country: 'PH', rating: 8.3 },
+  { id: 'vanskor', name: 'VANSKOR', teamId: 'au', role: 'support', country: 'UA', rating: 8.2 },
+  { id: 'mangonum', name: 'Mang0num', teamId: 'au', role: 'hard-support', country: 'MY', rating: 8.1 },
+]
