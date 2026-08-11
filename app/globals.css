@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
@@ -263,4 +264,31 @@
   animation: live-pulse 2s ease-in-out infinite;
   display: inline-block;
   flex-shrink: 0;
+}
+
+/* ==============================
+   TI 2026 UTILITY CLASSES
+   ============================== */
+.font-cinzel { font-family: 'Cinzel', serif; }
+.font-mono-data { font-family: 'JetBrains Mono', monospace; }
+.text-gold { color: #D4AF37; }
+.text-gold-bright { color: #FFD76A; }
+.text-gold-muted { color: #8A6418; }
+.bg-ti-black { background: #050505; }
+.bg-ti-card { background: #0F0D0A; }
+.border-gold { border-color: #D4AF37; }
+.border-gold-subtle { border-color: rgba(212, 175, 55, 0.15); }
+.glow-gold { box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+.glow-gold-subtle { box-shadow: 0 0 8px rgba(212, 175, 55, 0.15); }
+.ti-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes ti-particle-float {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-120px) translateX(20px); opacity: 0; }
 }

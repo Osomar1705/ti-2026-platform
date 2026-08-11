@@ -1,12 +1,13 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Shell } from '@/components/layout/Shell'
+import { LoadingScreen } from '@/components/shared/LoadingScreen'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'NEXUS — TI 2026 Analytics',
+  title: 'PANCHO WEB — TI 2026 Analytics',
   description: 'Plataforma de seguimiento, análisis y simulación de The International 2026.',
-  generator: 'NEXUS TI 2026',
+  generator: 'PANCHO WEB TI 2026',
   icons: {
     icon: [
       {
@@ -42,6 +43,7 @@ export default function RootLayout({
   return (
     <html lang="es" className="dark bg-background">
       <body className="antialiased">
+        <LoadingScreen />
         <Shell>{children}</Shell>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
