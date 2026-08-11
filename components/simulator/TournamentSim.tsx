@@ -485,29 +485,65 @@ function TeamName({ teamsById, id }: { teamsById: Record<string, any>; id: strin
 /*  MatchRow                                                             */
 /* ------------------------------------------------------------------ */
 function MatchRow({ match, teamsById, onSave, onDateChange }: any) {
-  const [sa, setSa] = useState(match.scoreA)
-  const [sb, setSb] = useState(match.scoreB)
+  const [sa, setSa] = useState<number | ''>(match.scoreA)
+  const [sb, setSb] = useState<number | ''>(match.scoreB)
+  const [dirty, setDirty] = useState(false)
+
   const nameA = teamsById[match.teamAId]?.name || '?'
   const nameB = teamsById[match.teamBId]?.name || '?'
-  const scoreA = sa === '' ? 0 : sa
-  const scoreB = sb === '' ? 0 : sb
-  const onChg = (setter: any) => (e: any) => { const v = e.target.value; if (v === '') { setter(''); return }; setter(Math.min(3, Math.max(0, parseInt(v) || 0))) }
+  const scoreA = sa === '' ? 0 : (sa as number)
+  const scoreB = sb === '' ? 0 : (sb as number)
+
+  const onChg = (setter: any) => (e: any) => {
+    const v = e.target.value
+    if (v === '') { setter(''); setDirty(true); return }
+    setter(Math.min(3, Math.max(0, parseInt(v) || 0)))
+    setDirty(true)
+  }
+
+  const handleSave = () => {
+    onSave(scoreA, scoreB)
+    setDirty(false)
+  }
+
+  // Auto-save when scores form a clear result (one side > 0, total ≥ 1)
+  useEffect(() => {
+    if (!dirty) return
+    const total = scoreA + scoreB
+    if (total > 0 && scoreA !== scoreB) {
+      const t = setTimeout(() => { onSave(scoreA, scoreB); setDirty(false) }, 600)
+      return () => clearTimeout(t)
+    }
+  }, [sa, sb, dirty]) // eslint-disable-line
+
   const aWin = match.played && match.scoreA > match.scoreB
   const bWin = match.played && match.scoreB > match.scoreA
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, borderBottom: `1px solid rgba(212,175,55,0.08)`, padding: '6px 4px' }}>
+    <div style={{ borderBottom: `1px solid rgba(212,175,55,0.08)`, padding: '5px 4px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+        {/* Team A */}
         <span style={{ flex: 1, textAlign: 'right', fontWeight: aWin ? 700 : 400, color: aWin ? C.radiant : C.text }}>{nameA}</span>
+        {/* Scores */}
         <input type="number" min={0} max={3} value={sa} onFocus={(e) => e.currentTarget.select()} onChange={onChg(setSa)} onBlur={() => sa === '' && setSa(0)} style={s.scoreInput} />
-        <span style={{ color: C.faint }}>–</span>
+        <span style={{ color: C.faint, fontSize: 11 }}>–</span>
         <input type="number" min={0} max={3} value={sb} onFocus={(e) => e.currentTarget.select()} onChange={onChg(setSb)} onBlur={() => sb === '' && setSb(0)} style={s.scoreInput} />
+        {/* Team B */}
         <span style={{ flex: 1, fontWeight: bWin ? 700 : 400, color: bWin ? C.radiant : C.text }}>{nameB}</span>
-        <button onClick={() => onSave(scoreA, scoreB)} style={s.saveBtn} title="Guardar"><Check size={14} /></button>
-        {match.played && <Badge color={C.gold}>jugado</Badge>}
+        {/* Save button */}
+        <button
+          onClick={handleSave}
+          style={{ ...s.saveBtn, background: dirty ? C.gold + '22' : C.surface, borderColor: dirty ? C.gold + '88' : C.border, color: dirty ? C.gold : C.radiant, minWidth: 32 }}
+          title="Guardar resultado"
+        >
+          <Check size={13} />
+        </button>
+        {/* Status badge */}
+        {match.played && !dirty && <Badge color={aWin || bWin ? C.radiant : C.muted}>{aWin ? `✓ ${nameA}` : bWin ? `✓ ${nameB}` : 'jugado'}</Badge>}
       </div>
       {onDateChange && (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 11, color: C.muted }}>{match.date ? formatDate(match.date) : 'sin fecha'}</span>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 6, marginTop: 2 }}>
+          <span style={{ fontSize: 10, color: C.faint }}>{match.date ? formatDate(match.date) : ''}</span>
           <input type="datetime-local" value={match.date || ''} onChange={(e) => onDateChange(e.target.value || null)}
             style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 4, color: C.muted, fontSize: 10, padding: '1px 4px' }} />
         </div>
@@ -770,18 +806,45 @@ function TIStageView({ tournament, updateTournament }: any) {
           })}
         </tbody>
       </table>
-      {rounds.map((round: any[], ri: number) => (
-        <div key={ri} style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 11, color: C.muted, marginBottom: 4, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Ronda {ri + 1}</div>
-          {sortByDate(round).map((m: any) => (
-            <MatchRow key={m.id} match={m} teamsById={teamsById} onSave={(sa: number, sb: number) => setSwissResult(ri, m.id, sa, sb)} onDateChange={(date: string | null) => setSwissDate(ri, m.id, date)} />
-          ))}
-        </div>
-      ))}
+      {rounds.map((round: any[], ri: number) => {
+        const played = round.filter((m: any) => m.played).length
+        const total  = round.length
+        const isCurrentRound = ri === rounds.length - 1
+        return (
+          <div key={ri} style={{ marginBottom: 20 }}>
+            {/* Round header + progress */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+              <span style={{ fontSize: 11, color: isCurrentRound ? C.gold : C.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Ronda {ri + 1}
+              </span>
+              <span style={{ fontSize: 11, color: played === total ? C.radiant : C.muted }}>
+                {played}/{total} guardados
+              </span>
+              {played === total && <Badge color={C.radiant}>completa</Badge>}
+            </div>
+            {sortByDate(round).map((m: any) => (
+              <MatchRow key={m.id} match={m} teamsById={teamsById} onSave={(sa: number, sb: number) => setSwissResult(ri, m.id, sa, sb)} onDateChange={(date: string | null) => setSwissDate(ri, m.id, date)} />
+            ))}
+          </div>
+        )
+      })}
+
+      {/* Generate next round button */}
       {!swissDone && rounds.length < SWISS_ROUNDS && (
-        <button onClick={nextSwissRound} disabled={!currentRoundPlayed} style={{ ...s.primaryBtn, opacity: currentRoundPlayed ? 1 : 0.35 }}>
-          <Layers size={16} /> Generar ronda {rounds.length + 1}
-        </button>
+        <div style={{ marginTop: 8 }}>
+          <button
+            onClick={nextSwissRound}
+            disabled={!currentRoundPlayed}
+            style={{ ...s.primaryBtn, opacity: currentRoundPlayed ? 1 : 0.4, cursor: currentRoundPlayed ? 'pointer' : 'not-allowed' }}
+          >
+            <Layers size={16} /> Generar ronda {rounds.length + 1}
+          </button>
+          {!currentRoundPlayed && (
+            <p style={{ fontSize: 12, color: C.muted, marginTop: 6 }}>
+              Guarda todos los resultados de la ronda {rounds.length} primero — los scores se auto-guardan 0.6s después de ingresar un resultado claro.
+            </p>
+          )}
+        </div>
       )}
       {swissDone && <p style={{ fontSize: 12, color: C.muted, marginTop: 8 }}>Fase suiza completa. Ve a la pestaña "Elimination Round" para continuar.</p>}
     </div>
