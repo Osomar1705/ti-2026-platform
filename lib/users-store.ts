@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { dbSelect, dbInsert, dbDelete } from './supabase'
 
 export interface AuthorizedUser {
   name: string
@@ -8,17 +8,12 @@ export interface AuthorizedUser {
 }
 
 export async function readUsers(): Promise<AuthorizedUser[]> {
-  const { data } = await supabase.from('authorized_users').select('*')
-  return data ?? []
+  return dbSelect<AuthorizedUser>('authorized_users')
 }
 
 export async function isAuthorized(email: string): Promise<AuthorizedUser | null> {
-  const { data } = await supabase
-    .from('authorized_users')
-    .select('*')
-    .eq('email', email.toLowerCase())
-    .single()
-  return data ?? null
+  const rows = await dbSelect<AuthorizedUser>('authorized_users', { email: `eq.${email.toLowerCase()}` })
+  return rows[0] ?? null
 }
 
 export async function isSuperAdmin(email: string): Promise<boolean> {
@@ -27,15 +22,18 @@ export async function isSuperAdmin(email: string): Promise<boolean> {
 }
 
 export async function addUser(user: Omit<AuthorizedUser, 'added_at'>): Promise<{ error?: string }> {
-  const { error } = await supabase.from('authorized_users').insert({
-    ...user,
-    email: user.email.toLowerCase(),
-    added_at: new Date().toISOString().split('T')[0],
-  })
-  if (error) return { error: error.message }
-  return {}
+  try {
+    await dbInsert('authorized_users', {
+      ...user,
+      email: user.email.toLowerCase(),
+      added_at: new Date().toISOString().split('T')[0],
+    })
+    return {}
+  } catch (e: any) {
+    return { error: e.message }
+  }
 }
 
 export async function removeUser(email: string): Promise<void> {
-  await supabase.from('authorized_users').delete().eq('email', email.toLowerCase())
+  await dbDelete('authorized_users', { email: `eq.${email.toLowerCase()}` })
 }

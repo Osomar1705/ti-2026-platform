@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { dbSelect, dbInsert, dbUpdate } from './supabase'
 
 export interface User {
   id: string
@@ -15,30 +15,18 @@ export interface User {
 }
 
 export async function findByEmail(email: string): Promise<User | null> {
-  const { data } = await supabase
-    .from('users')
-    .select('*')
-    .eq('email', email.toLowerCase())
-    .single()
-  return data ?? null
+  const rows = await dbSelect<User>('users', { email: `eq.${email.toLowerCase()}` })
+  return rows[0] ?? null
 }
 
 export async function findByUsername(username: string): Promise<User | null> {
-  const { data } = await supabase
-    .from('users')
-    .select('*')
-    .eq('username', username.toLowerCase())
-    .single()
-  return data ?? null
+  const rows = await dbSelect<User>('users', { username: `eq.${username.toLowerCase()}` })
+  return rows[0] ?? null
 }
 
 export async function findById(id: string): Promise<User | null> {
-  const { data } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', id)
-    .single()
-  return data ?? null
+  const rows = await dbSelect<User>('users', { id: `eq.${id}` })
+  return rows[0] ?? null
 }
 
 export async function createUser(input: {
@@ -47,38 +35,29 @@ export async function createUser(input: {
   email: string
   country: string
 }): Promise<User> {
-  const { data, error } = await supabase
-    .from('users')
-    .insert({
-      username: input.username.toLowerCase(),
-      name: input.name,
-      email: input.email.toLowerCase(),
-      country: input.country,
-    })
-    .select()
-    .single()
-
-  if (error) throw new Error(error.message)
-  return data
+  return dbInsert<User>('users', {
+    username: input.username.toLowerCase(),
+    name: input.name,
+    email: input.email.toLowerCase(),
+    country: input.country,
+  })
 }
 
 export async function updateUser(id: string, patch: Partial<Pick<User, 'name' | 'bio' | 'country'>>): Promise<User | null> {
-  const { data } = await supabase
-    .from('users')
-    .update(patch)
-    .eq('id', id)
-    .select()
-    .single()
-  return data ?? null
+  return dbUpdate<User>('users', { id: `eq.${id}` }, patch)
 }
 
 export async function getLeaderboard() {
-  const { data } = await supabase
-    .from('users')
-    .select('id, username, name, country, points, correct, total, streak')
-    .order('points', { ascending: false })
-  return (data ?? []).map((u, i) => ({
-    ...u,
+  const rows = await dbSelect<User>('users', { order: 'points.desc' })
+  return rows.map((u, i) => ({
+    id: u.id,
+    username: u.username,
+    name: u.name,
+    country: u.country,
+    points: u.points,
+    correct: u.correct,
+    total: u.total,
+    streak: u.streak,
     rank: i + 1,
     accuracy: u.total > 0 ? Math.round((u.correct / u.total) * 100) : 0,
   }))
