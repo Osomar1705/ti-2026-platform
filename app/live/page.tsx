@@ -19,7 +19,7 @@ export default function LivePage() {
 
 const tournamentStreams = {
     twitch: 'dota2ti_es', 
-    youtube: 'UCbEhNEf6zVdmd4C61ALvsAw', 
+    youtube: 'TGmnhNbna8Q', 
     kick: 'dotati'
   };
 
