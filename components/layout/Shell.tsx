@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image' 
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import {
@@ -12,6 +12,7 @@ import {
   Radio,
   Search,
   Settings2,
+  ShieldCheck,
   Sparkles,
   Target,
   Trophy,
@@ -20,6 +21,8 @@ import {
   X,
   ArrowUpRight,
 } from 'lucide-react'
+import { getAdminUser, type AdminUser } from '@/lib/auth'
+import { useUser } from '@/lib/hooks/useUser'
 
 const navItems = [
   { label: 'Inicio', href: '/', icon: Home },
@@ -43,11 +46,17 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null)
+  const { user: sessionUser } = useUser()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    getAdminUser().then(setAdminUser)
   }, [])
 
   return (
@@ -160,9 +169,34 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <Bell className="size-4" />
               <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-[#D4AF37]" />
             </button>
-            <div className="flex size-8 items-center justify-center rounded-full border border-[rgba(212,175,55,0.2)] bg-[rgba(212,175,55,0.08)] text-xs font-bold text-[#D4AF37]">
-              AL
-            </div>
+            {adminUser && (
+              <Link
+                href="/admin"
+                className="flex items-center gap-2 rounded-full border border-[rgba(212,175,55,0.3)] bg-[rgba(212,175,55,0.08)] px-2.5 py-1.5 text-xs font-bold text-[#D4AF37] hover:bg-[rgba(212,175,55,0.14)] transition-colors"
+              >
+                <ShieldCheck className="size-3.5" />
+                {adminUser.name.split(' ')[0]}
+              </Link>
+            )}
+            {sessionUser ? (
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 rounded-full border border-[rgba(212,175,55,0.2)] bg-[rgba(212,175,55,0.06)] px-2.5 py-1.5 text-xs font-semibold text-[#F5F1E8] hover:bg-[rgba(212,175,55,0.1)] transition-colors"
+              >
+                <div className="flex size-5 items-center justify-center rounded-full bg-[rgba(212,175,55,0.2)] text-[9px] font-black text-[#D4AF37]">
+                  {sessionUser.username.slice(0, 2).toUpperCase()}
+                </div>
+                {sessionUser.username}
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="flex items-center gap-1.5 rounded-full border border-[rgba(212,175,55,0.2)] bg-[rgba(212,175,55,0.06)] px-3 py-1.5 text-xs font-semibold text-[#D4AF37] hover:bg-[rgba(212,175,55,0.1)] transition-colors"
+              >
+                <UserRound className="size-3.5" />
+                Entrar
+              </Link>
+            )}
           </div>
         </header>
 
