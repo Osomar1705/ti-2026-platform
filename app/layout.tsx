@@ -1,7 +1,5 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Shell } from '@/components/layout/Shell'
-import { LoadingScreen } from '@/components/shared/LoadingScreen'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -43,8 +41,7 @@ export default function RootLayout({
   return (
     <html lang="es" className="dark bg-background">
       <body className="antialiased">
-        <LoadingScreen />
-        <Shell>{children}</Shell>
+        {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
