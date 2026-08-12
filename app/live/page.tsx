@@ -51,6 +51,11 @@ const tournamentStreams = {
         </Link>
       </div>
 
+      {/* LiveStreamLink */}
+      <div className="mb-6 w-full">
+        <LiveStreamPlayer streamUrls={tournamentStreams} />
+      </div>
+
       {/* Score hero */}
       <Surface className="mb-6 p-6 gold-top-border relative">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
