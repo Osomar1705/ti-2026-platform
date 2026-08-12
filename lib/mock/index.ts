@@ -25,8 +25,8 @@ export const navItems = [
 ]
 
 export const tournamentStats = [
-  { label: 'Winrate promedio', value: '68.4%', change: '+4.2%' },
-  { label: 'Duración promedio', value: '36:42', change: '-2:18' },
-  { label: 'Primera sangre', value: '57.8%', change: '+1.9%' },
-  { label: 'Héroe más pickeado', value: 'Pangolier', change: '18 picks' },
+  { label: 'Winrate promedio', value: '0.0%', change: '+0.0%' },
+  { label: 'Duración promedio', value: '00:00', change: '0:00' },
+  { label: 'Primera sangre', value: '0.0%', change: '+0.0%' },
+  { label: 'Héroe más pickeado', value: 'TBD', change: 'TBD picks' },
 ]
