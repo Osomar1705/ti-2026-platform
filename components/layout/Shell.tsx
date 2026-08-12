@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image' 
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import {
@@ -60,9 +61,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
         {/* Logo */}
         <div className="flex items-center justify-between px-2">
           <Link href="/" className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-lg border border-[rgba(212,175,55,0.3)] bg-[rgba(212,175,55,0.08)] font-black text-[#D4AF37] animate-glow-pulse">
-              TI
-            </div>
+            
+            <Image 
+              src="/logo-pancho-blanco.png" 
+              alt="Logo Pancho Web" 
+              width={36} 
+              height={36} 
+              className="rounded-lg" 
+            />
+
             <div>
               <div className="text-sm font-bold tracking-wide text-[#D4AF37]">PANCHO WEB</div>
               <div className="font-mono text-[9px] uppercase tracking-[.2em] text-[#8A7A5A]">THE INTERNATIONAL 2026</div>
