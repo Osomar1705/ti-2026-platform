@@ -19,6 +19,32 @@ const GOLD    = '#D4AF37'
 const uid = () => Math.random().toString(36).slice(2, 10)
 const DATA_AS_OF = '10 de agosto de 2026'
 
+const handleScoreInput = (
+  currentScoreA: number,
+  currentScoreB: number,
+  teamToUpdate: 'A' | 'B',
+  newValue: string,
+  bestOf: number = 3
+) => {
+  const winsNeeded = Math.ceil(bestOf / 2);
+  let parsedValue = parseInt(newValue, 10);
+
+  if (isNaN(parsedValue) || parsedValue < 0) parsedValue = 0;
+  if (parsedValue > winsNeeded) parsedValue = winsNeeded;
+
+  if (teamToUpdate === 'A' && parsedValue === winsNeeded && currentScoreB === winsNeeded) {
+    return { scoreA: parsedValue, scoreB: winsNeeded - 1 };
+  }
+  if (teamToUpdate === 'B' && parsedValue === winsNeeded && currentScoreA === winsNeeded) {
+    return { scoreA: winsNeeded - 1, scoreB: parsedValue };
+  }
+
+  return {
+    scoreA: teamToUpdate === 'A' ? parsedValue : currentScoreA,
+    scoreB: teamToUpdate === 'B' ? parsedValue : currentScoreB
+  };
+};
+
 function seedOrder(size: number): number[] {
   let result = [1, 2]
   while (result.length < size) {
