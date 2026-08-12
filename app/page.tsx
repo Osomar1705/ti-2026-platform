@@ -172,17 +172,6 @@ export default function Page() {
           </div>
         </Surface>
 
-        {/* Disclaimer */}
-        <footer className="mt-12 border-t border-[rgba(212,175,55,0.08)] pt-6 pb-4">
-          <div className="mx-auto max-w-4xl text-center">
-            <p className="text-[11px] leading-5 text-[#8A7A5A] font-medium antialiased">
-              PanchoWeb es una plataforma independiente de simulación con fines recreativos y estadísticos. 
-              No está afiliada, patrocinada ni asociada con Valve Corporation, PGL ni los equipos de esports mencionados. 
-              Dota 2 y The International son marcas registradas de Valve Corporation.
-            </p>
-          </div>
-        </footer>
-
         {/* Pancho recommendations */}
         <div className="mb-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {panchoRecommendations.map((rec) => (
@@ -222,6 +211,17 @@ export default function Page() {
             ))}
           </div>
         </Surface>
+
+        {/* Disclaimer */}
+        <footer className="mt-12 border-t border-[rgba(212,175,55,0.08)] pt-6 pb-4">
+          <div className="mx-auto max-w-4xl text-center">
+            <p className="text-[11px] leading-5 text-[#8A7A5A] font-medium antialiased">
+              PanchoWeb es una plataforma independiente de simulación con fines recreativos y estadísticos. 
+              No está afiliada, patrocinada ni asociada con Valve Corporation, PGL ni los equipos de esports mencionados. 
+              Dota 2 y The International son marcas registradas de Valve Corporation.
+            </p>
+          </div>
+        </footer>
       </div>
     </div>
   )
