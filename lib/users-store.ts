@@ -1,34 +1,41 @@
-import fs from 'fs'
-import path from 'path'
+import { supabase } from './supabase'
 
 export interface AuthorizedUser {
   name: string
   email: string
   role: 'superadmin' | 'admin'
-  addedAt: string
+  added_at: string
 }
 
-const FILE_PATH = path.join(process.cwd(), 'data', 'authorized-users.json')
-
-export function readUsers(): AuthorizedUser[] {
-  try {
-    const raw = fs.readFileSync(FILE_PATH, 'utf-8')
-    return JSON.parse(raw).users ?? []
-  } catch {
-    return []
-  }
+export async function readUsers(): Promise<AuthorizedUser[]> {
+  const { data } = await supabase.from('authorized_users').select('*')
+  return data ?? []
 }
 
-export function writeUsers(users: AuthorizedUser[]): void {
-  fs.writeFileSync(FILE_PATH, JSON.stringify({ users }, null, 2), 'utf-8')
+export async function isAuthorized(email: string): Promise<AuthorizedUser | null> {
+  const { data } = await supabase
+    .from('authorized_users')
+    .select('*')
+    .eq('email', email.toLowerCase())
+    .single()
+  return data ?? null
 }
 
-export function isAuthorized(email: string): AuthorizedUser | null {
-  const users = readUsers()
-  return users.find(u => u.email.toLowerCase() === email.toLowerCase()) ?? null
-}
-
-export function isSuperAdmin(email: string): boolean {
-  const user = isAuthorized(email)
+export async function isSuperAdmin(email: string): Promise<boolean> {
+  const user = await isAuthorized(email)
   return user?.role === 'superadmin'
+}
+
+export async function addUser(user: Omit<AuthorizedUser, 'added_at'>): Promise<{ error?: string }> {
+  const { error } = await supabase.from('authorized_users').insert({
+    ...user,
+    email: user.email.toLowerCase(),
+    added_at: new Date().toISOString().split('T')[0],
+  })
+  if (error) return { error: error.message }
+  return {}
+}
+
+export async function removeUser(email: string): Promise<void> {
+  await supabase.from('authorized_users').delete().eq('email', email.toLowerCase())
 }

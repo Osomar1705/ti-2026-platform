@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   const email = body.email.toLowerCase().trim()
   const name = body.name.trim()
 
-  const authorized = isAuthorized(email)
+  const authorized = await isAuthorized(email)
   if (!authorized) {
     return NextResponse.json({ error: 'Correo no autorizado.' }, { status: 403 })
   }

@@ -1,5 +1,4 @@
-import fs from 'fs'
-import path from 'path'
+import { supabase } from './supabase'
 
 export interface User {
   id: string
@@ -12,56 +11,75 @@ export interface User {
   correct: number
   total: number
   streak: number
-  createdAt: string
+  created_at: string
 }
 
-const FILE_PATH = path.join(process.cwd(), 'data', 'users.json')
-
-export function readUsers(): User[] {
-  try {
-    const raw = fs.readFileSync(FILE_PATH, 'utf-8')
-    return JSON.parse(raw).users ?? []
-  } catch {
-    return []
-  }
+export async function findByEmail(email: string): Promise<User | null> {
+  const { data } = await supabase
+    .from('users')
+    .select('*')
+    .eq('email', email.toLowerCase())
+    .single()
+  return data ?? null
 }
 
-export function writeUsers(users: User[]): void {
-  fs.writeFileSync(FILE_PATH, JSON.stringify({ users }, null, 2), 'utf-8')
+export async function findByUsername(username: string): Promise<User | null> {
+  const { data } = await supabase
+    .from('users')
+    .select('*')
+    .eq('username', username.toLowerCase())
+    .single()
+  return data ?? null
 }
 
-export function findByEmail(email: string): User | null {
-  return readUsers().find(u => u.email.toLowerCase() === email.toLowerCase()) ?? null
+export async function findById(id: string): Promise<User | null> {
+  const { data } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', id)
+    .single()
+  return data ?? null
 }
 
-export function findByUsername(username: string): User | null {
-  return readUsers().find(u => u.username.toLowerCase() === username.toLowerCase()) ?? null
+export async function createUser(input: {
+  username: string
+  name: string
+  email: string
+  country: string
+}): Promise<User> {
+  const { data, error } = await supabase
+    .from('users')
+    .insert({
+      username: input.username.toLowerCase(),
+      name: input.name,
+      email: input.email.toLowerCase(),
+      country: input.country,
+    })
+    .select()
+    .single()
+
+  if (error) throw new Error(error.message)
+  return data
 }
 
-export function findById(id: string): User | null {
-  return readUsers().find(u => u.id === id) ?? null
+export async function updateUser(id: string, patch: Partial<Pick<User, 'name' | 'bio' | 'country'>>): Promise<User | null> {
+  const { data } = await supabase
+    .from('users')
+    .update(patch)
+    .eq('id', id)
+    .select()
+    .single()
+  return data ?? null
 }
 
-export function createUser(data: Omit<User, 'id' | 'points' | 'correct' | 'total' | 'streak' | 'createdAt'>): User {
-  const users = readUsers()
-  const user: User = {
-    ...data,
-    id: crypto.randomUUID(),
-    points: 0,
-    correct: 0,
-    total: 0,
-    streak: 0,
-    createdAt: new Date().toISOString().split('T')[0],
-  }
-  writeUsers([...users, user])
-  return user
-}
-
-export function updateUser(id: string, patch: Partial<User>): User | null {
-  const users = readUsers()
-  const idx = users.findIndex(u => u.id === id)
-  if (idx === -1) return null
-  users[idx] = { ...users[idx], ...patch }
-  writeUsers(users)
-  return users[idx]
+export async function getLeaderboard() {
+  const { data } = await supabase
+    .from('users')
+    .select('id, username, name, country, points, correct, total, streak')
+    .order('points', { ascending: false })
+  return (data ?? []).map((u, i) => ({
+    ...u,
+    rank: i + 1,
+    accuracy: u.total > 0 ? Math.round((u.correct / u.total) * 100) : 0,
+  }))
 }

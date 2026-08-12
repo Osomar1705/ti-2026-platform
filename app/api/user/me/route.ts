@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const { id } = JSON.parse(cookie.value)
-    const user = findById(id)
+    const user = await findById(id)
     return NextResponse.json({ user: user ?? null })
   } catch {
     return NextResponse.json({ user: null })
