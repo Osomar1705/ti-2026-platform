@@ -10,11 +10,18 @@ import { PlayerTable } from '@/components/match/PlayerTable'
 import { players } from '@/lib/mock/teams'
 import Link from 'next/link'
 import { ChevronRight, Zap } from 'lucide-react'
+import LiveStreamPlayer from '@/components/simulator/LiveStreamPlayer';
 
 // Page showing the live match in detail
 export default function LivePage() {
   const game = liveMatch.liveGame!
   const radiantPlayerIds = players.filter(p => p.teamId === liveMatch.radiant.id).map(p => p.id)
+
+const tournamentStreams = {
+    twitch: 'dota2ti_es', 
+    youtube: 'UCbEhNEf6zVdmd4C61ALvsAw', 
+    kick: 'dotati'
+  };
 
   return (
     <div className="mx-auto max-w-[1440px] p-4 md:p-8">
