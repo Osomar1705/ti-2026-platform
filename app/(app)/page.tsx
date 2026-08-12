@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { Heart, MessageCircle, ChevronRight } from 'lucide-react'
-import { teams, liveMatch, upcomingMatches, recentMatches, panchoRecommendations, tournamentStats, bracketColumns } from '@/lib/mock/index'
+import { liveMatch, upcomingMatches, recentMatches, panchoRecommendations, tournamentStats } from '@/lib/mock/index'
 import { communityPosts } from '@/lib/ti2026-data'
+import { useUser } from '@/lib/hooks/useUser'
 import { Surface, SectionTitle, TeamMark, LiveBadge, StatCard, MatchRow } from '@/components/shared/ui'
 import { WinProbabilityBar } from '@/components/match/WinProbabilityBar'
 import { WinProbabilityChart } from '@/components/match/WinProbabilityChart'
@@ -12,7 +13,10 @@ import { PanchoCard } from '@/components/pancho/PanchoCard'
 
 export default function Page() {
   const [liked, setLiked] = useState<number[]>([])
-  const game = liveMatch.liveGame!
+  const { user } = useUser()
+  const game = liveMatch.liveGame
+
+  if (!game) return null
 
   return (
     <div>
@@ -94,7 +98,7 @@ export default function Page() {
         <div className="mb-8 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-[#F5F1E8] md:text-4xl">
-              Buenas noches, <span className="text-[#D4AF37]">Alex.</span>
+              {user ? <>Bienvenido, <span className="text-[#D4AF37]">{user.name || user.username}.</span></> : <>TI 2026 · <span className="text-[#D4AF37]">En vivo</span></>}
             </h1>
             <p className="mt-2 text-sm text-[#8A7A5A]">
               The International 2026 · <span className="text-[#D4AF37] font-semibold">Día 12</span> de 18 · Riad
@@ -152,7 +156,7 @@ export default function Page() {
         {/* Two-column grid: upcoming + tournament stats */}
         <div className="mb-5 grid gap-5 lg:grid-cols-2">
           <Surface className="p-5">
-            <SectionTitle eyebrow="Centro de partidas" title="Próximas partidas" action="Ver horario" />
+            <SectionTitle eyebrow="Centro de partidas" title="Próximas partidas" action="Ver horario" actionHref="/live" />
             <div className="-mx-4 border-t border-[rgba(212,175,55,0.08)]">
               {upcomingMatches.map((m) => (
                 <MatchRow key={m.id} match={m} />
@@ -164,7 +168,7 @@ export default function Page() {
             <SectionTitle eyebrow="Señales" title="Resumen del torneo" />
             <div className="grid grid-cols-2 gap-3">
               {tournamentStats.map((stat) => (
-                <StatCard key={stat.label} stat={stat} />
+                <StatCard key={stat.label} {...stat} />
               ))}
             </div>
           </Surface>
@@ -172,7 +176,7 @@ export default function Page() {
 
         {/* Recent results */}
         <Surface className="mb-5 p-5">
-          <SectionTitle eyebrow="Feed de partidas" title="Resultados recientes" action="Todos los resultados" />
+          <SectionTitle eyebrow="Feed de partidas" title="Resultados recientes" action="Todos los resultados" actionHref="/live" />
           <div className="-mx-4 border-t border-[rgba(212,175,55,0.08)]">
             {recentMatches.map((match) => (
               <MatchRow key={match.id} match={match} />
@@ -189,7 +193,7 @@ export default function Page() {
 
         {/* Community posts */}
         <Surface className="p-5">
-          <SectionTitle eyebrow="Comunidad" title="Qué dicen los fans" action="Abrir comunidad" />
+          <SectionTitle eyebrow="Comunidad" title="Qué dicen los fans" action="Abrir comunidad" actionHref="/community" />
           <div className="flex flex-col gap-4">
             {communityPosts.map((post, i) => (
               <div key={post.user} className="border-b border-[rgba(212,175,55,0.08)] pb-3 last:border-0">

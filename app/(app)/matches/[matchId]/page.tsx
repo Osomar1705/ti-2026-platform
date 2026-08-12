@@ -30,7 +30,7 @@ export default function MatchPage({ params }: { params: Promise<{ matchId: strin
     <div className="mx-auto max-w-[1440px] p-4 md:p-8">
       {/* Breadcrumb */}
       <div className="mb-6 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">
-        <span>Nexus</span>
+        <span>Pancho Web</span>
         <ChevronRight className="size-3" />
         <span>Partidas</span>
         <ChevronRight className="size-3" />
@@ -144,6 +144,16 @@ export default function MatchPage({ params }: { params: Promise<{ matchId: strin
         <Surface className="p-5">
           <SectionTitle eyebrow="Economía" title="Net worth y experiencia" />
           <EconomyChart data={game.economyHistory} height={320} />
+        </Surface>
+      )}
+
+
+      {/* Empty state when no game data available */}
+      {!game && (tab === 'RESUMEN' || tab === 'DRAFT' || tab === 'JUGADORES' || tab === 'ECONOMÍA') && (
+        <Surface className="flex flex-col items-center justify-center py-16 text-center">
+          <p className="text-4xl">📊</p>
+          <p className="mt-3 text-sm font-semibold">Datos no disponibles</p>
+          <p className="mt-1 text-xs text-muted-foreground">Esta partida aún no tiene estadísticas detalladas registradas.</p>
         </Surface>
       )}
 

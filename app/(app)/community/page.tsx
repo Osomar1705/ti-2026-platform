@@ -5,6 +5,7 @@ import { posts as initialPosts } from '@/lib/mock/community'
 import { Surface, SectionTitle } from '@/components/shared/ui'
 import type { Post } from '@/lib/types'
 import { ChevronRight, Heart, MessageCircle, Send } from 'lucide-react'
+import { useUser } from '@/lib/hooks/useUser'
 
 const ROOMS = [
   { id: 'general', label: 'GENERAL' },
@@ -14,6 +15,7 @@ const ROOMS = [
 ]
 
 export default function CommunityPage() {
+  const { user } = useUser()
   const [room, setRoom] = useState('general')
   const [posts, setPosts] = useState<Post[]>(initialPosts)
   const [liked, setLiked] = useState<string[]>([])
@@ -23,11 +25,12 @@ export default function CommunityPage() {
 
   function submitPost() {
     if (!newPost.trim()) return
+    const displayName = user?.username || 'anon'
     const post: Post = {
       id: `p-${Date.now()}`,
-      userId: 'alex',
-      username: 'Alex',
-      avatar: 'AL',
+      userId: user?.id || 'anon',
+      username: displayName,
+      avatar: displayName.slice(0, 2).toUpperCase(),
       room,
       text: newPost.trim(),
       likes: 0,
@@ -45,7 +48,7 @@ export default function CommunityPage() {
   return (
     <div className="mx-auto max-w-[1440px] p-4 md:p-8">
       <div className="mb-6 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">
-        <span>Nexus</span>
+        <span>Pancho Web</span>
         <ChevronRight className="size-3" />
         <span className="text-primary">Comunidad</span>
       </div>
@@ -76,7 +79,7 @@ export default function CommunityPage() {
           {/* Post composer */}
           <Surface className="p-4">
             <div className="flex gap-3">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-bold">AL</div>
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-bold">{user ? user.username.slice(0, 2).toUpperCase() : "AN"}</div>
               <div className="flex-1">
                 <textarea
                   value={newPost}

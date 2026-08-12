@@ -71,7 +71,7 @@ export default function BracketPage() {
   return (
     <div className="mx-auto max-w-[1440px] p-4 md:p-8">
       <div className="mb-6 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">
-        <span>Nexus</span>
+        <span>Pancho Web</span>
         <ChevronRight className="size-3" />
         <span className="text-primary">TI 2026</span>
       </div>

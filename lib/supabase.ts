@@ -1,7 +1,7 @@
 import https from 'node:https'
 
-const SUPABASE_URL = 'https://nsugalwrqktooexzmcib.supabase.co'
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zdWdhbHdycWt0b29leHptY2liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NjcxMTUsImV4cCI6MjEwMjE0MzExNX0.zuZJcS0BQLAqqgeNkH0kgPD8GVqg3X-cQOGXLWbGwZE'
+const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? '').trim().replace(/\/$/, '')
+const SUPABASE_KEY = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '').trim()
 
 function request(method: string, path: string, body?: unknown): Promise<{ ok: boolean; status: number; data: unknown }> {
   return new Promise((resolve, reject) => {

@@ -14,14 +14,26 @@ import LiveStreamPlayer from '@/components/simulator/LiveStreamPlayer';
 
 // Page showing the live match in detail
 export default function LivePage() {
-  const game = liveMatch.liveGame!
+  const game = liveMatch.liveGame
   const radiantPlayerIds = players.filter(p => p.teamId === liveMatch.radiant.id).map(p => p.id)
 
-const tournamentStreams = {
-    twitch: 'dota2ti_es', 
-    youtube: 'TGmnhNbna8Q', 
+  const tournamentStreams = {
+    twitch: 'dota2ti_es',
+    youtube: 'TGmnhNbna8Q',
     kick: 'dotati'
-  };
+  }
+
+  if (!game) {
+    return (
+      <div className="mx-auto max-w-[1440px] p-4 md:p-8">
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <p className="text-4xl">📡</p>
+          <p className="mt-3 text-sm font-semibold text-[#F5F1E8]">Sin partida en vivo</p>
+          <p className="mt-1 text-xs text-[#8A7A5A]">No hay ninguna partida en curso en este momento.</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="mx-auto max-w-[1440px] p-4 md:p-8">

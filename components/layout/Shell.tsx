@@ -6,12 +6,9 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import {
   BarChart3,
-  Bell,
   Home,
   Menu,
   Radio,
-  Search,
-  Settings2,
   ShieldCheck,
   Sparkles,
   Target,
@@ -20,6 +17,7 @@ import {
   Users,
   X,
   ArrowUpRight,
+  Medal,
 } from 'lucide-react'
 import { getAdminUser, type AdminUser } from '@/lib/auth'
 import { useUser } from '@/lib/hooks/useUser'
@@ -30,6 +28,7 @@ const navItems = [
   { label: 'TI 2026', href: '/bracket', icon: Trophy },
   { label: 'Estadísticas', href: '/statistics', icon: BarChart3 },
   { label: 'Simulador', href: '/simulator', icon: Target },
+  { label: 'Predicciones', href: '/predictions', icon: Medal },
   { label: 'Comunidad', href: '/community', icon: Users },
   { label: 'Perfil', href: '/profile', icon: UserRound },
 ]
@@ -37,7 +36,7 @@ const navItems = [
 const mobileNavItems = [
   { label: 'Inicio', href: '/', icon: Home },
   { label: 'En vivo', href: '/live', icon: Radio },
-  { label: 'Simulador', href: '/simulator', icon: Target },
+  { label: 'TI 2026', href: '/bracket', icon: Trophy },
   { label: 'Comunidad', href: '/community', icon: Users },
   { label: 'Perfil', href: '/profile', icon: UserRound },
 ]
@@ -70,15 +69,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
         {/* Logo */}
         <div className="flex items-center justify-between px-2">
           <Link href="/" className="flex items-center gap-3">
-            
-            <Image 
-              src="/logo-pancho-blanco.png" 
-              alt="Logo Pancho Web" 
-              width={36} 
-              height={36} 
-              className="rounded-lg" 
+            <Image
+              src="/pancho-logo-blanco.png"
+              alt="Pancho Web"
+              width={38}
+              height={38}
+              className="shrink-0"
             />
-
             <div>
               <div className="text-sm font-bold tracking-wide text-[#D4AF37]">PANCHO WEB</div>
               <div className="font-mono text-[9px] uppercase tracking-[.2em] text-[#8A7A5A]">THE INTERNATIONAL 2026</div>
@@ -90,7 +87,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Nav */}
-        <nav className="mt-9 flex flex-col gap-0.5">
+        <nav className="mt-8 flex flex-col gap-0.5">
           {navItems.map(({ label, href, icon: Icon, live }) => {
             const isActive = pathname === href || (href !== '/' && pathname.startsWith(href))
             return (
@@ -118,21 +115,22 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <div className="mt-auto rounded-xl border border-[rgba(212,175,55,0.15)] bg-[rgba(212,175,55,0.04)] p-3">
           <div className="flex items-center gap-2">
             <Sparkles className="size-4 text-[#D4AF37]" />
-            <span className="text-xs font-semibold text-[#F5F1E8]">Analista Pancho</span>
+            <span className="text-xs font-semibold text-[#F5F1E8]">Análisis de Pancho</span>
           </div>
           <p className="mt-2 text-[11px] leading-4 text-[#8A7A5A]">
-            Recomendaciones basadas en señales del torneo.
+            Picks, probabilidades y alertas de upset para el TI 2026.
           </p>
-          <Link href="/" className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-[#D4AF37]">
-            Explorar picks <ArrowUpRight className="size-3" />
+          <Link href="/predictions" className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-[#D4AF37]">
+            Ver análisis <ArrowUpRight className="size-3" />
           </Link>
         </div>
 
         {/* Footer */}
-        <div className="mt-4 flex items-center justify-between px-2 text-[#8A7A5A]">
-          <Settings2 className="size-4" />
-          <span className="font-mono text-[10px]">v0.2 beta</span>
-          <UserRound className="size-4" />
+        <div className="mt-4 px-2">
+          <div className="flex items-center justify-center gap-1.5 rounded-lg border border-[rgba(212,175,55,0.1)] py-1.5">
+            <span className="size-1.5 rounded-full bg-[rgba(212,175,55,0.5)]" />
+            <span className="font-mono text-[10px] text-[#4A3F2F]">BETA · v0.2</span>
+          </div>
         </div>
       </aside>
 
@@ -150,25 +148,17 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <button className="md:hidden text-[#8A7A5A] hover:text-[#F5F1E8]" onClick={() => setMobileOpen(true)}>
               <Menu className="size-5" />
             </button>
-            <div className="relative hidden sm:block">
-              <Search className="absolute left-3 top-2.5 size-4 text-[#8A7A5A]" />
-              <input
-                placeholder="Buscar equipos, jugadores, partidas..."
-                className="w-64 rounded-lg border border-[rgba(212,175,55,0.12)] bg-[rgba(212,175,55,0.04)] py-2 pl-9 pr-3 text-xs text-[#F5F1E8] outline-none placeholder:text-[#8A7A5A] focus:border-[rgba(212,175,55,0.4)]"
-              />
+            <div className="flex items-center gap-2 md:hidden">
+              <Image src="/pancho-logo-blanco.png" alt="Pancho Web" width={28} height={28} />
+              <span className="text-sm font-bold text-[#D4AF37]">PANCHO WEB</span>
             </div>
-            <span className="text-sm font-bold text-[#D4AF37] sm:hidden">PANCHO WEB</span>
           </div>
+
           <div className="flex items-center gap-3">
             <div className="hidden items-center gap-2 rounded-full border border-[rgba(212,175,55,0.15)] bg-[rgba(212,175,55,0.04)] px-3 py-1.5 sm:flex">
-              <span className="size-1.5 rounded-full bg-amber-500" />
-              <span className="font-mono text-[10px] font-semibold text-[#8A7A5A]">DATOS MOCK</span>
-              <span className="text-[10px] text-[#8A7A5A]">· hace 8 seg</span>
+              <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
+              <span className="font-mono text-[10px] font-semibold text-[#8A7A5A]">DATOS MOCK · TI 2026</span>
             </div>
-            <button className="relative rounded-lg p-2 text-[#8A7A5A] hover:bg-[rgba(212,175,55,0.06)] hover:text-[#F5F1E8]">
-              <Bell className="size-4" />
-              <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-[#D4AF37]" />
-            </button>
             {adminUser && (
               <Link
                 href="/admin"
@@ -186,7 +176,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 <div className="flex size-5 items-center justify-center rounded-full bg-[rgba(212,175,55,0.2)] text-[9px] font-black text-[#D4AF37]">
                   {sessionUser.username.slice(0, 2).toUpperCase()}
                 </div>
-                {sessionUser.username}
+                <span className="hidden sm:inline">{sessionUser.username}</span>
               </Link>
             ) : (
               <Link

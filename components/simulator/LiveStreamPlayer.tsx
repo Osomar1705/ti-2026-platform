@@ -58,7 +58,7 @@ export default function LiveStreamPlayer({ streamUrls }: LiveStreamPlayerProps) 
         // Carga siempre el directo activo de un ID de canal
         return (
           <iframe
-            src={`https://www.youtube.com/embed/live_stream?channel=${streamUrls.youtube}&autoplay=1&mute=0`}
+            src={`https://www.youtube.com/embed/${streamUrls.youtube}?autoplay=1&mute=1&rel=0`}
             allowFullScreen
             style={iframeStyle}
           />

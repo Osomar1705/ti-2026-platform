@@ -6,23 +6,25 @@ import { Surface, SectionTitle, TeamMark } from '@/components/shared/ui'
 import type { Prediction } from '@/lib/types'
 import { ChevronRight, Lock, Trophy } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useUser } from '@/lib/hooks/useUser'
 
-const MOCK_PREDICTIONS: Prediction[] = [
-  { id: 'pred-1', userId: 'alex', matchId: 'tl-vs-gg-ub-sf', predictedWinner: 'tl', predictedScore: '2-1', locked: false },
-  { id: 'pred-2', userId: 'alex', matchId: 'ng-vs-au-lb-r2', predictedWinner: 'ng', predictedScore: '1-0', locked: true, correct: undefined },
-]
-
-const LEADERBOARD_PREVIEW = [
+interface LeaderPreview { rank: number; username: string; points: number; accuracy: number; isYou?: boolean }
+const LEADERBOARD_PREVIEW_BASE: LeaderPreview[] = [
   { rank: 1, username: 'draftsmith', points: 1420, accuracy: 78 },
   { rank: 2, username: 'ti_stats_bot', points: 1280, accuracy: 72 },
   { rank: 3, username: 'roshanwatch', points: 1190, accuracy: 68 },
   { rank: 4, username: 'analystvip', points: 1050, accuracy: 65 },
-  { rank: 5, username: 'Alex', points: 840, accuracy: 64, isYou: true },
 ]
 
 export default function PredictionsPage() {
-  const [predictions, setPredictions] = useState<Prediction[]>(MOCK_PREDICTIONS)
+  const { user } = useUser()
+  const userId = user?.username ?? 'anon'
+  const [predictions, setPredictions] = useState<Prediction[]>([])
   const upcomingMatches = matches.filter((m) => m.status === 'upcoming')
+
+  const LEADERBOARD_PREVIEW: LeaderPreview[] = user
+    ? [...LEADERBOARD_PREVIEW_BASE, { rank: 5, username: user.username, points: user.points ?? 840, accuracy: user.total > 0 ? Math.round((user.correct / user.total) * 100) : 64, isYou: true }]
+    : LEADERBOARD_PREVIEW_BASE
 
   function setPrediction(matchId: string, winner: string, score: string) {
     setPredictions((prev) => {
@@ -30,7 +32,7 @@ export default function PredictionsPage() {
       if (existing) {
         return prev.map((p) => p.matchId === matchId ? { ...p, predictedWinner: winner, predictedScore: score } : p)
       }
-      return [...prev, { id: `pred-${Date.now()}`, userId: 'alex', matchId, predictedWinner: winner, predictedScore: score, locked: false }]
+      return [...prev, { id: `pred-${Date.now()}`, userId, matchId, predictedWinner: winner, predictedScore: score, locked: false }]
     })
   }
 
@@ -41,7 +43,7 @@ export default function PredictionsPage() {
   return (
     <div className="mx-auto max-w-[1440px] p-4 md:p-8">
       <div className="mb-6 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">
-        <span>Nexus</span>
+        <span>Pancho Web</span>
         <ChevronRight className="size-3" />
         <span className="text-primary">Predicciones</span>
       </div>
@@ -130,21 +132,21 @@ export default function PredictionsPage() {
         <Surface className="h-fit p-5">
           <SectionTitle eyebrow="Ranking" title="Top predictores" actionHref="/leaderboard" action="Ver todo" />
           <div className="flex flex-col gap-2">
-            {LEADERBOARD_PREVIEW.map((user) => (
+            {LEADERBOARD_PREVIEW.map((entry) => (
               <div
-                key={user.rank}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 ${(user as any).isYou ? 'border border-primary/30 bg-primary/5' : 'bg-muted/20'}`}
+                key={entry.rank}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 ${entry.isYou ? 'border border-primary/30 bg-primary/5' : 'bg-muted/20'}`}
               >
-                <span className={`w-5 font-mono text-sm font-bold ${user.rank <= 3 ? 'text-primary' : 'text-muted-foreground'}`}>
-                  {user.rank <= 3 ? ['🥇','🥈','🥉'][user.rank - 1] : user.rank}
+                <span className={`w-5 font-mono text-sm font-bold ${entry.rank <= 3 ? 'text-primary' : 'text-muted-foreground'}`}>
+                  {entry.rank <= 3 ? ['🥇','🥈','🥉'][entry.rank - 1] : entry.rank}
                 </span>
                 <div className="flex size-7 items-center justify-center rounded-full bg-secondary text-[10px] font-bold">
-                  {user.username.slice(0, 2).toUpperCase()}
+                  {entry.username.slice(0, 2).toUpperCase()}
                 </div>
-                <span className="flex-1 text-xs font-semibold">{user.username}{(user as any).isYou ? ' (tú)' : ''}</span>
+                <span className="flex-1 text-xs font-semibold">{entry.username}{entry.isYou ? ' (tú)' : ''}</span>
                 <div className="text-right">
-                  <p className="font-mono text-xs font-bold text-primary">{user.points}</p>
-                  <p className="font-mono text-[10px] text-muted-foreground">{user.accuracy}%</p>
+                  <p className="font-mono text-xs font-bold text-primary">{entry.points}</p>
+                  <p className="font-mono text-[10px] text-muted-foreground">{entry.accuracy}%</p>
                 </div>
               </div>
             ))}

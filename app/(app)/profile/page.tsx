@@ -122,7 +122,7 @@ export default function ProfilePage() {
                   </button>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {user.bio || `Miembro desde ${user.createdAt}`}
+                  {user.bio || `Miembro desde ${user.created_at ? new Date(user.created_at).toLocaleDateString("es") : "—"}`}
                 </p>
                 <div className="mt-4 grid grid-cols-3 gap-4 sm:grid-cols-5">
                   {[

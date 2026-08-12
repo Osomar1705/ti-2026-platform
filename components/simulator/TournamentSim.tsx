@@ -334,76 +334,8 @@ function buildTI2026() {
   return { id: uid(), presetKey: 'ti2026', name: 'The International 2026', teams, format: 'ti_swiss', swiss: { rounds: [round1] }, initialGroupOf, eliminationRound: null, bracket: null }
 }
 
-/* ------------------------------------------------------------------ */
-/*  EPL Masters I                                                        */
-/* ------------------------------------------------------------------ */
-const EPL1_GROUP_A = ['Power Rangers','Ilbirs eSports','Team Syntax','Nemiga Gaming','Team Jenz','Amaru Gaming']
-const EPL1_GROUP_B = ['Level UP','Zero Tenacity','RE Arise','No Hoodwink','PuckChamp']
-const EPL1_RESULTS_A: [string,string,number,number][] = [['Power Rangers','Ilbirs eSports',2,1],['Power Rangers','Nemiga Gaming',2,1],['Power Rangers','Team Jenz',2,0],['Power Rangers','Amaru Gaming',2,0],['Power Rangers','Team Syntax',2,0],['Ilbirs eSports','Team Syntax',2,0],['Ilbirs eSports','Nemiga Gaming',2,1],['Ilbirs eSports','Amaru Gaming',2,0],['Ilbirs eSports','Team Jenz',2,0],['Team Syntax','Nemiga Gaming',2,1],['Team Syntax','Team Jenz',2,1],['Team Syntax','Amaru Gaming',2,0],['Nemiga Gaming','Amaru Gaming',2,1],['Nemiga Gaming','Team Jenz',2,0],['Amaru Gaming','Team Jenz',2,0]]
-const EPL1_RESULTS_B: [string,string,number,number][] = [['Level UP','Zero Tenacity',2,1],['Level UP','RE Arise',2,0],['Level UP','No Hoodwink',2,1],['Level UP','PuckChamp',2,0],['Zero Tenacity','RE Arise',2,0],['Zero Tenacity','No Hoodwink',2,0],['Zero Tenacity','PuckChamp',2,0],['RE Arise','No Hoodwink',2,1],['RE Arise','PuckChamp',2,0],['No Hoodwink','PuckChamp',2,0]]
-const EPL1_DATES_A: [string,string,string][] = [['Power Rangers','Ilbirs eSports','2026-08-06T18:56'],['Power Rangers','Nemiga Gaming','2026-07-28T09:03'],['Power Rangers','Team Jenz','2026-08-07T15:10'],['Power Rangers','Amaru Gaming','2026-07-30T16:17'],['Ilbirs eSports','Team Syntax','2026-08-07T12:17'],['Ilbirs eSports','Nemiga Gaming','2026-07-26T09:13'],['Ilbirs eSports','Amaru Gaming','2026-07-30T18:50'],['Team Syntax','Nemiga Gaming','2026-07-27T12:09'],['Team Syntax','Team Jenz','2026-07-26T18:12'],['Team Syntax','Amaru Gaming','2026-07-29T19:30'],['Nemiga Gaming','Amaru Gaming','2026-07-29T15:00'],['Team Jenz','Nemiga Gaming','2026-08-07T19:00'],['Power Rangers','Team Syntax','2026-08-08T09:00'],['Team Jenz','Ilbirs eSports','2026-08-08T15:00'],['Amaru Gaming','Team Jenz','2026-08-08T18:00']]
-const EPL1_DATES_B: [string,string,string][] = [['Level UP','Zero Tenacity','2026-07-30T12:07'],['Level UP','RE Arise','2026-08-06T09:12'],['Level UP','No Hoodwink','2026-08-06T15:00'],['Level UP','PuckChamp','2026-07-27T09:07'],['Zero Tenacity','RE Arise','2026-07-29T12:06'],['Zero Tenacity','No Hoodwink','2026-08-07T09:00'],['Zero Tenacity','PuckChamp','2026-07-30T09:08'],['RE Arise','No Hoodwink','2026-08-06T12:00'],['RE Arise','PuckChamp','2026-07-26T13:05'],['No Hoodwink','PuckChamp','2026-07-28T12:02']]
-const EPL1_ROSTERS: Record<string, { nick: string; country: string }[]> = {
-  'Team Syntax':[{nick:'leni',country:'Türkiye'},{nick:'Mikey',country:'Iran'},{nick:'Emptiness死',country:'Kazakhstan'},{nick:'Jeezy',country:'Türkiye'},{nick:'Stoic',country:'Türkiye'}],
-  'Team Jenz':[{nick:'Parker',country:'Peru'},{nick:'No!ob',country:'Lebanon'},{nick:'ruustle',country:'Lebanon'},{nick:'Jing',country:'Philippines'},{nick:'Yadomi',country:'Peru'}],
-  'PuckChamp':[{nick:'Yuragi',country:'Ukraine'},{nick:'xn丶e',country:'Estonia'},{nick:'krol9ash',country:'Ukraine'},{nick:'Gothic-',country:'Ukraine'},{nick:'Hyuga',country:'Ukraine'}],
-  'Zero Tenacity':[{nick:'nesfeer',country:'Russia'},{nick:'Worick',country:'Russia'},{nick:'Miksa',country:'Serbia'},{nick:'dEsire',country:'Greece'},{nick:'MoOz',country:'Peru'}],
-  'Nemiga Gaming':[{nick:'byun',country:'Belarus'},{nick:'young G',country:'Belarus'},{nick:'Covisnine',country:'Sevastopol'},{nick:'ariel',country:'Russia'},{nick:'JANTER',country:'Russia'}],
-  'Level UP':[{nick:'WoE',country:'Russia'},{nick:'Ainkrad',country:'Belarus'},{nick:'bb3px',country:'Russia'},{nick:'queezy',country:'Russia'},{nick:'Htrd',country:'Russia'}],
-  'Ilbirs eSports':[{nick:'423',country:'Mongolia'},{nick:'niche',country:'Ukraine'},{nick:'Norma',country:'Ukraine'},{nick:'Fernans',country:'Ukraine'},{nick:'ponlo',country:'Singapore/Georgia'}],
-  'Amaru Gaming':[{nick:'K1',country:'Peru'},{nick:'PiPi',country:'Peru'},{nick:'Oscar',country:'Bolivia'},{nick:'Genek',country:'Peru'},{nick:'Panda',country:'Peru'}],
-  'Power Rangers':[{nick:'bashka',country:'Russia'},{nick:'kiyotaka',country:'Russia'},{nick:'alberkaaa',country:'Russia'},{nick:'Immersion',country:'Russia'},{nick:'Till The End',country:'Ukraine'}],
-  'RE Arise':[{nick:'yowaai',country:'Ukraine'},{nick:'Ethereal',country:'Kazakhstan'},{nick:'Ankou ♡',country:'Estonia'},{nick:'ani-san',country:'Kazakhstan'},{nick:'waveformn',country:'Russia'}],
-}
-const EPL1_PRIZE_POOL = [{place:'1er lugar',amount:'$50,000'},{place:'2do lugar',amount:'$25,000'},{place:'3er lugar',amount:'$13,000'},{place:'4to lugar',amount:'$7,000'},{place:'5to-6to lugar',amount:'$2,500'},{place:'5to-6to lugar',amount:'$2,500'}]
-const EPL1_DIRECT_INVITES = ['Yellow Submarine','MOUZ','Rune Eaters','NAVI']
-const EPL1_PLAYOFF_DATES = {
-  ub:[['2026-08-09T09:00','2026-08-09T12:00','2026-08-09T15:00','2026-08-09T18:00'],['2026-08-10T15:00','2026-08-10T18:00'],['2026-08-11T15:00']],
-  lb:[['2026-08-10T09:00','2026-08-10T12:00'],['2026-08-11T09:00','2026-08-11T12:00'],['2026-08-11T18:00'],['2026-08-12T09:00']],
-  grandFinal:['2026-08-12T15:00'],
-}
-
-function applyDEDates(bracket: any, dates: any) {
-  const ub = bracket.ub.map((round: any[], r: number) => round.map((m: any, i: number) => ({ ...m, date: dates.ub?.[r]?.[i] || m.date })))
-  const lb = bracket.lb.map((round: any[], r: number) => round.map((m: any, i: number) => ({ ...m, date: dates.lb?.[r]?.[i] || m.date })))
-  const grandFinal = bracket.grandFinal.map((m: any, i: number) => ({ ...m, date: dates.grandFinal?.[i] || m.date }))
-  return { ub, lb, grandFinal }
-}
-
-function buildEplPlayoffs(tournament: any) {
-  const teamsById = Object.fromEntries(tournament.teams.map((t: any) => [t.id, t]))
-  const byName = Object.fromEntries(tournament.teams.map((t: any) => [t.name, t.id])) as Record<string,string>
-  const [groupA, groupB] = tournament.groups
-  const standingsA = calcStandings(groupA, teamsById as any)
-  const standingsB = calcStandings(groupB, teamsById as any)
-  const [ys, mouz, runeEaters, navi] = EPL1_DIRECT_INVITES.map((n) => (byName as any)[n])
-  const pairs: [string,string][] = [
-    [(standingsA[0] as any).teamId, ys],
-    [(standingsB[0] as any).teamId, mouz],
-    [(standingsA[1] as any).teamId, runeEaters],
-    [(standingsB[1] as any).teamId, navi],
-  ]
-  return applyDEDates(generateDoubleElimN(pairs), EPL1_PLAYOFF_DATES)
-}
-
-function buildEPLMasters1() {
-  const teamsA = EPL1_GROUP_A.map((n) => ({ id: uid(), name: n, roster: EPL1_ROSTERS[n] || null }))
-  const teamsB = EPL1_GROUP_B.map((n) => ({ id: uid(), name: n, roster: EPL1_ROSTERS[n] || null }))
-  const directInvites = EPL1_DIRECT_INVITES.map((n) => ({ id: uid(), name: n, roster: null, directInvite: true }))
-  const teams = [...teamsA, ...teamsB, ...directInvites]
-  const byName = Object.fromEntries(teams.map((t) => [t.name, t.id])) as Record<string,string>
-  let matchesA = roundRobinMatches(teamsA.map((t) => t.id))
-  EPL1_RESULTS_A.forEach(([a,b,sa,sb]) => { matchesA = applyResult(matchesA, byName, a, b, sa, sb) })
-  EPL1_DATES_A.forEach(([a,b,date]) => { matchesA = applyDate(matchesA, byName, a, b, date) })
-  let matchesB = roundRobinMatches(teamsB.map((t) => t.id))
-  EPL1_RESULTS_B.forEach(([a,b,sa,sb]) => { matchesB = applyResult(matchesB, byName, a, b, sa, sb) })
-  EPL1_DATES_B.forEach(([a,b,date]) => { matchesB = applyDate(matchesB, byName, a, b, date) })
-  return { id: uid(), presetKey: 'eplmasters1', name: 'EPL Masters I', teams, format: 'both', qualifiers: 2, groups: [{ id: uid(), name: 'Grupo A', teamIds: teamsA.map((t) => t.id), matches: matchesA }, { id: uid(), name: 'Grupo B', teamIds: teamsB.map((t) => t.id), matches: matchesB }], bracket: null, doubleElimBracket: null, prizePool: EPL1_PRIZE_POOL }
-}
-
 const PRESETS = [
-  { key: 'ti2026', label: 'The International 2026', desc: '16 equipos · fase suiza · Shanghái · inicia 13 ago', build: buildTI2026 },
-  { key: 'eplmasters1', label: 'EPL Masters I', desc: '11 equipos activos · fase de grupos casi completa · playoffs por definir', build: buildEPLMasters1 },
+  { key: 'ti2026', label: 'The International 2026', desc: '16 equipos · fase suiza · Riad · inicia 13 ago', build: buildTI2026 },
 ]
 
 const MANUAL_TEMPLATES = [
@@ -650,16 +582,14 @@ function GroupsView({ tournament, updateTournament }: any) {
     updateTournament({ ...tournament, groups })
   }
   const allPlayed = tournament.groups.every((g: any) => g.matches.every((m: any) => m.played))
-  const isEpl = tournament.presetKey === 'eplmasters1'
   const generatePlayoffs = () => {
-    if (isEpl) { updateTournament({ ...tournament, doubleElimBracket: buildEplPlayoffs(tournament) }); return }
     const seeds: string[] = []
     const standingsByGroup = tournament.groups.map((g: any) => calcStandings(g, teamsById as any))
     const maxRank = tournament.qualifiers || Math.max(...standingsByGroup.map((s: any) => s.length))
     for (let rank = 0; rank < maxRank; rank++) standingsByGroup.forEach((s: any) => { if (s[rank]) seeds.push((s[rank] as any).teamId) })
     updateTournament({ ...tournament, bracket: generateBracket(seeds) })
   }
-  const hasPlayoffs = isEpl ? !!tournament.doubleElimBracket : !!tournament.bracket
+  const hasPlayoffs = !!tournament.bracket
   return (
     <div>
       {tournament.groups.map((group: any) => {
@@ -1158,11 +1088,11 @@ function TournamentDetail({ tournament, updateTournament, onBack, onDelete }: an
         <Badge color={tournament.format === 'bracket' ? C.dire : C.radiant}>{formatLabel[tournament.format]}</Badge>
         {tournament.presetKey && <Badge color="#8aa8c9">datos reales al {DATA_AS_OF}</Badge>}
       </div>
-      {tournament.presetKey && <p style={{ fontSize: 12, color: C.muted, marginBottom: 16 }}>Pídeme "actualiza los resultados" en el chat para refrescar este torneo.</p>}
+      {tournament.presetKey && <p style={{ fontSize: 12, color: C.muted, marginBottom: 16 }}>Los datos de este torneo corresponden al estado real al {DATA_AS_OF}.</p>}
       {hasTabs && (
         <div style={{ display: 'flex', gap: 0, marginBottom: 20, borderBottom: `1px solid ${C.border}`, flexWrap: 'wrap' }}>
           {tournament.format === 'both' && <TabBtn active={tab === 'groups'} onClick={() => setTab('groups')}><Users size={14} /> Grupos</TabBtn>}
-          {tournament.format === 'both' && <TabBtn active={tab === 'bracket'} onClick={() => setTab('bracket')} disabled={tournament.presetKey === 'eplmasters1' ? !tournament.doubleElimBracket : !tournament.bracket}><ListTree size={14} /> Playoffs</TabBtn>}
+          {tournament.format === 'both' && <TabBtn active={tab === 'bracket'} onClick={() => setTab('bracket')} disabled={!tournament.bracket}><ListTree size={14} /> Playoffs</TabBtn>}
           {tournament.format === 'ti_swiss' && <TabBtn active={tab === 'groups'} onClick={() => setTab('groups')}><Layers size={14} /> Fase suiza</TabBtn>}
           {tournament.format === 'ti_swiss' && <TabBtn active={tab === 'elimination'} onClick={() => setTab('elimination')}><ListTree size={14} /> Elimination Round</TabBtn>}
           {tournament.teams.some((t: any) => t.roster) && <TabBtn active={tab === 'rosters'} onClick={() => setTab('rosters')}><Users size={14} /> Equipos</TabBtn>}
@@ -1174,8 +1104,7 @@ function TournamentDetail({ tournament, updateTournament, onBack, onDelete }: an
       )}
       {(tournament.format === 'groups' || (tournament.format === 'both' && tab === 'groups')) && <GroupsView tournament={tournament} updateTournament={updateTournament} />}
       {tournament.format === 'bracket' && tournament.bracket && <BracketView bracket={tournament.bracket} teamsById={teamsById} onUpdateBracket={(b: any) => updateTournament({ ...tournament, bracket: b })} />}
-      {tournament.format === 'both' && tab === 'bracket' && tournament.presetKey === 'eplmasters1' && tournament.doubleElimBracket && <DoubleElimBracketView bracket={tournament.doubleElimBracket} teamsById={teamsById} onUpdate={(b: any) => updateTournament({ ...tournament, doubleElimBracket: b })} />}
-      {tournament.format === 'both' && tab === 'bracket' && tournament.presetKey !== 'eplmasters1' && tournament.bracket && <BracketView bracket={tournament.bracket} teamsById={teamsById} onUpdateBracket={(b: any) => updateTournament({ ...tournament, bracket: b })} />}
+      {tournament.format === 'both' && tab === 'bracket' && tournament.bracket && <BracketView bracket={tournament.bracket} teamsById={teamsById} onUpdateBracket={(b: any) => updateTournament({ ...tournament, bracket: b })} />}
       {tournament.format === 'ti_swiss' && tab === 'groups' && <TIStageView tournament={tournament} updateTournament={updateTournament} />}
       {tournament.format === 'ti_swiss' && tab === 'elimination' && <EliminationRoundView tournament={tournament} updateTournament={updateTournament} />}
       {tournament.format === 'ti_swiss' && tab === 'bracket' && tournament.bracket && <BracketView bracket={tournament.bracket} teamsById={teamsById} onUpdateBracket={(b: any) => updateTournament({ ...tournament, bracket: b })} title="Main Event" />}
