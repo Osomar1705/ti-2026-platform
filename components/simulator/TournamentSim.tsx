@@ -508,7 +508,7 @@ function TeamName({ teamsById, id }: { teamsById: Record<string, any>; id: strin
 }
 
 /* ------------------------------------------------------------------ */
-/*  MatchRow                                                             */
+/*  MatchRow                                                          */
 /* ------------------------------------------------------------------ */
 function MatchRow({ match, teamsById, onSave, onDateChange }: any) {
   const [sa, setSa] = useState<number | ''>(match.scoreA)
@@ -520,10 +520,45 @@ function MatchRow({ match, teamsById, onSave, onDateChange }: any) {
   const scoreA = sa === '' ? 0 : (sa as number)
   const scoreB = sb === '' ? 0 : (sb as number)
 
-  const onChg = (setter: any) => (e: any) => {
+  // 1. Calculamos dinámicamente cuántas victorias se necesitan (Ej: Bo3 = 2, Bo5 = 3)
+  const bestOf = match.bestOf || 3
+  const winsNeeded = Math.ceil(bestOf / 2)
+
+  // 2. Función de validación cruzada estricta
+  const handleScoreChange = (teamToUpdate: 'A' | 'B') => (e: any) => {
     const v = e.target.value
-    if (v === '') { setter(''); setDirty(true); return }
-    setter(Math.min(3, Math.max(0, parseInt(v) || 0)))
+    
+    // Si el usuario borra el contenido
+    if (v === '') { 
+      if (teamToUpdate === 'A') setSa('')
+      else setSb('')
+      setDirty(true)
+      return 
+    }
+
+    let parsedValue = parseInt(v, 10)
+    if (isNaN(parsedValue) || parsedValue < 0) parsedValue = 0
+    if (parsedValue > winsNeeded) parsedValue = winsNeeded
+
+    let newScoreA = scoreA
+    let newScoreB = scoreB
+
+    // Lógica para prevenir empates imposibles (Ej: evitar 2-2 en un Bo3)
+    if (teamToUpdate === 'A') {
+      newScoreA = parsedValue
+      if (newScoreA === winsNeeded && scoreB === winsNeeded) {
+        newScoreB = winsNeeded - 1
+      }
+    } else {
+      newScoreB = parsedValue
+      if (newScoreB === winsNeeded && scoreA === winsNeeded) {
+        newScoreA = winsNeeded - 1
+      }
+    }
+
+    // Actualizamos ambos estados al mismo tiempo
+    setSa(newScoreA)
+    setSb(newScoreB)
     setDirty(true)
   }
 
@@ -550,12 +585,33 @@ function MatchRow({ match, teamsById, onSave, onDateChange }: any) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
         {/* Team A */}
         <span style={{ flex: 1, textAlign: 'right', fontWeight: aWin ? 700 : 400, color: aWin ? C.radiant : C.text }}>{nameA}</span>
-        {/* Scores */}
-        <input type="number" min={0} max={3} value={sa} onFocus={(e) => e.currentTarget.select()} onChange={onChg(setSa)} onBlur={() => sa === '' && setSa(0)} style={s.scoreInput} />
+        
+        {/* Scores - Ahora usan handleScoreChange y el max dinámico */}
+        <input 
+          type="number" 
+          min={0} 
+          max={winsNeeded} 
+          value={sa} 
+          onFocus={(e) => e.currentTarget.select()} 
+          onChange={handleScoreChange('A')} 
+          onBlur={() => sa === '' && setSa(0)} 
+          style={s.scoreInput} 
+        />
         <span style={{ color: C.faint, fontSize: 11 }}>–</span>
-        <input type="number" min={0} max={3} value={sb} onFocus={(e) => e.currentTarget.select()} onChange={onChg(setSb)} onBlur={() => sb === '' && setSb(0)} style={s.scoreInput} />
+        <input 
+          type="number" 
+          min={0} 
+          max={winsNeeded} 
+          value={sb} 
+          onFocus={(e) => e.currentTarget.select()} 
+          onChange={handleScoreChange('B')} 
+          onBlur={() => sb === '' && setSb(0)} 
+          style={s.scoreInput} 
+        />
+        
         {/* Team B */}
         <span style={{ flex: 1, fontWeight: bWin ? 700 : 400, color: bWin ? C.radiant : C.text }}>{nameB}</span>
+        
         {/* Save button */}
         <button
           onClick={handleSave}
@@ -564,9 +620,11 @@ function MatchRow({ match, teamsById, onSave, onDateChange }: any) {
         >
           <Check size={13} />
         </button>
+        
         {/* Status badge */}
         {match.played && !dirty && <Badge color={aWin || bWin ? C.radiant : C.muted}>{aWin ? `✓ ${nameA}` : bWin ? `✓ ${nameB}` : 'jugado'}</Badge>}
       </div>
+      
       {onDateChange && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 6, marginTop: 2 }}>
           <span style={{ fontSize: 10, color: C.faint }}>{match.date ? formatDate(match.date) : ''}</span>
