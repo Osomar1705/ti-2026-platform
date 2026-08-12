@@ -5,7 +5,6 @@ import {
   Trophy, Plus, Trash2, Users, ChevronRight, ArrowLeft, Check,
   ListTree, Layers, Swords, RefreshCw,
 } from 'lucide-react'
-import LiveStreamPlayer from './LiveStreamPlayer';
 
 /* ------------------------------------------------------------------ */
 /*  Paleta                                                               */
@@ -872,20 +871,8 @@ function TIStageView({ tournament, updateTournament }: any) {
     updateTournament({ ...tournament, swiss: { rounds: [...rounds, generateSwissRound(teamIds, rounds, pairFilter)] } })
   }
 
-  // 1. AÑADIMOS LAS URLS DEL TORNEO AQUÍ
-  const tournamentStreams = {
-    twitch: 'dota2ti_es', 
-    youtube: 'UCbEhNEf6zVdmd4C61ALvsAw', 
-    kick: 'dotati'
-  };
-
   return (
     <div>
-      {/* 2. INYECTAMOS EL REPRODUCTOR EN VIVO AQUÍ (Justo arriba del título de la ronda) */}
-      <div style={{ marginBottom: '24px', width: '100%' }}>
-        <LiveStreamPlayer streamUrls={tournamentStreams} />
-      </div>
-
       <h3 style={s.h3}>Fase suiza · ronda {rounds.length} de {SWISS_ROUNDS}</h3>
       <table style={s.table}>
         <thead><tr><th style={s.th}>#</th><th style={{ ...s.th, textAlign: 'left' }}>Equipo</th><th style={s.th}>G</th><th style={s.th}>P</th><th style={s.th}>Estado</th></tr></thead>
