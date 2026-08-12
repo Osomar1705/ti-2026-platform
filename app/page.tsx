@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { Heart, MessageCircle, ChevronRight } from 'lucide-react'
 import { teams, liveMatch, upcomingMatches, recentMatches, panchoRecommendations, tournamentStats, bracketColumns } from '@/lib/mock/index'
 import { communityPosts } from '@/lib/ti2026-data'
@@ -51,9 +52,16 @@ export default function Page() {
 
         {/* Hero content */}
         <div className="relative mx-auto max-w-4xl px-4 text-center">
-          {/* TI Logo badge */}
-          <div className="mx-auto mb-8 flex size-24 items-center justify-center rounded-2xl border border-[rgba(212,175,55,0.3)] bg-[rgba(212,175,55,0.06)] animate-glow-pulse">
-            <span className="font-black text-4xl text-[#D4AF37]">TI</span>
+          
+          {/* Logo Central PanchoWeb */}
+          <div className="mb-8 flex justify-center">
+            <Image 
+              src="/logo-pancho.png" 
+              alt="Logo Central Pancho Web" 
+              width={120} 
+              height={120} 
+              className="drop-shadow-[0_0_25px_rgba(212,175,55,0.35)] hover:scale-105 transition-transform duration-300" 
+            />
           </div>
 
           <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#8A7A5A] mb-3">DOTA 2</p>
