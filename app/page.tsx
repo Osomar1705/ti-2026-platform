@@ -56,7 +56,7 @@ export default function Page() {
           {/* Logo Central PanchoWeb */}
           <div className="mb-8 flex justify-center">
             <Image 
-              src="/logo-pancho.png" 
+              src="/logo-pancho-blanco.png" 
               alt="Logo Central Pancho Web" 
               width={120} 
               height={120} 
