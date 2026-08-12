@@ -16,8 +16,6 @@ export default function Page() {
   const { user } = useUser()
   const game = liveMatch.liveGame
 
-  if (!game) return null
-
   return (
     <div>
       {/* ── HERO ── */}
@@ -60,7 +58,7 @@ export default function Page() {
           {/* Logo Central PanchoWeb */}
           <div className="mb-8 flex justify-center">
             <Image 
-              src="/logo-pancho-blanco.png" 
+              src="/pancho-logo-blanco.png"
               alt="Logo Central Pancho Web" 
               width={120} 
               height={120} 
@@ -110,7 +108,7 @@ export default function Page() {
         <Surface className="relative mb-5 overflow-hidden p-5 gold-top-border">
           <div className="mb-4 flex items-center gap-3">
             <LiveBadge />
-            <span className="text-xs text-[#8A7A5A]">{liveMatch.phase} · Partida {liveMatch.currentGame} · {game.duration}</span>
+            <span className="text-xs text-[#8A7A5A]">{liveMatch.phase} · Partida {liveMatch.currentGame}{game ? ` · ${game.duration}` : ''}</span>
           </div>
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
             <div className="flex flex-col items-center gap-2">
@@ -119,7 +117,7 @@ export default function Page() {
               <p className="font-mono text-3xl font-bold text-[#F5F1E8]">{liveMatch.radiantScore}</p>
             </div>
             <div className="text-center">
-              <p className="font-mono text-xs text-[#8A7A5A]">{game.duration}</p>
+              <p className="font-mono text-xs text-[#8A7A5A]">{game?.duration ?? '—'}</p>
               <div className="my-2 text-[10px] font-semibold uppercase tracking-widest text-[#8A7A5A]">vs</div>
               <span className="rounded-full bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.2)] px-2 py-1 font-mono text-[10px] font-bold text-[#D4AF37]">BO3</span>
             </div>
@@ -142,16 +140,18 @@ export default function Page() {
         </Surface>
 
         {/* Win probability chart */}
-        <Surface className="mb-5 p-5">
-          <SectionTitle eyebrow="En vivo" title="Probabilidad de victoria — Partida 2" />
-          <WinProbabilityChart
-            data={game.winProbHistory}
-            radiantLabel={liveMatch.radiant.short}
-            direLabel={liveMatch.dire.short}
-            radiantColor={liveMatch.radiant.color}
-            direColor={liveMatch.dire.color}
-          />
-        </Surface>
+        {game && (
+          <Surface className="mb-5 p-5">
+            <SectionTitle eyebrow="En vivo" title="Probabilidad de victoria — Partida 2" />
+            <WinProbabilityChart
+              data={game.winProbHistory}
+              radiantLabel={liveMatch.radiant.short}
+              direLabel={liveMatch.dire.short}
+              radiantColor={liveMatch.radiant.color}
+              direColor={liveMatch.dire.color}
+            />
+          </Surface>
+        )}
 
         {/* Two-column grid: upcoming + tournament stats */}
         <div className="mb-5 grid gap-5 lg:grid-cols-2">
