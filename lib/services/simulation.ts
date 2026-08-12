@@ -4,8 +4,10 @@ export function simulateSeries(
   teamA: Team,
   teamB: Team,
   bestOf: number = 3,
+  userMvpRecommendations: Record<string, Record<string, number>>
 ): { pctA: number; pctB: number; predictedResult: string; duration: string; mvp: string } {
-  // Simple simulation based on seed ratings
+  
+  // Simulación básica de probabilidades basada en el rating (seed)
   const seedDiff = teamB.seed - teamA.seed
   const base = Math.min(Math.max(50 + seedDiff * 4, 30), 70)
   const pctA = base
@@ -15,34 +17,54 @@ export function simulateSeries(
   const winner = pctA >= 50 ? teamA.short : teamB.short
   const loser = pctA >= 50 ? teamB.short : teamA.short
 
-  let predictedResult: string
+ // CORRECCIÓN DE BUG: Marcadores precisos y matemáticamente posibles
   if (bestOf === 1) {
     predictedResult = `${winner} gana`
   } else {
-    const loserWins = pctA >= 60 || pctB >= 60 ? 0 : 1
+    // El perdedor puede ganar desde 0 hasta (winsNeeded - 1) mapas
+    const maxLoserWins = winsNeeded - 1
+    // Algoritmo de distribución de victorias del perdedor basado en probabilidad
+    let loserWins = 0
+    if (pctA < 65 && pctB < 65) {
+      // Si los equipos están parejos, asignamos mapas al perdedor (con límite máximo)
+      loserWins = Math.min(1, maxLoserWins) 
+    }
+    
     predictedResult = `${winner} ${winsNeeded}–${loserWins} ${loser}`
   }
 
   const durations = ['32–40 min', '36–44 min', '38–48 min', '40–50 min']
   const duration = durations[Math.floor(Math.abs(seedDiff) % durations.length)]
 
-  const mvpCandidates: Record<string, string> = {
-    ts: 'Yatoro',
-    te: 'Skiter',
-    tl: 'Nisha',
-    gg: 'Quinn',
-    ng: 'Miracle-',
-    au: 'SabeRLight-',
+  // NUEVO ALGORITMO MVP: Basado estrictamente en votos de los usuarios
+  let mvp = 'TBD'
+  const teamVotes = userMvpRecommendations[winnerTeamId]
+
+  if (teamVotes && Object.keys(teamVotes).length > 0) {
+    let maxVotes = -1
+    let currentMvp = 'TBD'
+    let isTie = false
+
+    for (const [playerName, votes] of Object.entries(teamVotes)) {
+      if (votes > maxVotes) {
+        maxVotes = votes
+        currentMvp = playerName
+        isTie = false // Se rompe cualquier empate previo
+      } else if (votes === maxVotes) {
+        isTie = true // Se detecta empate en la cantidad máxima
+      }
+    }
+    
+    // Si hay empate en la cima o no hay votos válidos, se retorna 'TBD'
+    mvp = isTie ? 'TBD' : currentMvp
   }
-  const mvpTeam = pctA >= 50 ? teamA.id : teamB.id
-  const mvp = mvpCandidates[mvpTeam] ?? 'TBD'
 
   return { pctA, pctB, predictedResult, duration, mvp }
 }
 
 export function simulateTournament(
   teams: Team[],
-  iterations: number = 1000,
+  iterations: number = 1000
 ): Record<string, { champion: number; top3: number; topHalf: number }> {
   const results: Record<string, { champion: number; top3: number; topHalf: number }> = {}
 
