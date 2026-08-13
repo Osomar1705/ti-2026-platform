@@ -33,10 +33,10 @@ function TeamScore({ name, tag, kills, netWorth, isRadiant }: {
 }) {
   const color = isRadiant ? '#4ADE80' : '#F87171'
   const isGeneric = name === 'Radiant' || name === 'Dire'
-  const displayName = isGeneric ? (isRadiant ? '🟢 Radiant' : '🔴 Dire') : name
+  const displayName = isGeneric ? (isRadiant ? '— Radiant —' : '— Dire —') : name
   return (
     <div className="flex flex-col items-center gap-1 flex-1">
-      <div style={{ fontSize: 22, fontWeight: 800, color: isGeneric ? '#8A7A5A' : '#F5F1E8', letterSpacing: '-0.01em', textAlign: 'center' }}>
+      <div style={{ fontSize: isGeneric ? 13 : 20, fontWeight: isGeneric ? 400 : 800, color: isGeneric ? '#555' : '#F5F1E8', letterSpacing: '-0.01em', textAlign: 'center', fontStyle: isGeneric ? 'italic' : 'normal' }}>
         {displayName}
       </div>
       <div style={{ fontFamily: 'monospace', fontSize: 52, fontWeight: 900, color, lineHeight: 1 }}>{kills}</div>
