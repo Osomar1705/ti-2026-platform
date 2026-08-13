@@ -102,7 +102,7 @@ export default function BracketPage() {
       <div className="mb-8">
         <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37]">The International 2026</p>
         <h1 className="mt-1 text-3xl font-bold text-[#F5F1E8]">Bracket de playoffs</h1>
-        <p className="mt-2 text-sm text-[#8A7A5A]">Riad, Arabia Saudita · El bracket se define tras la Fase de Grupos (13–16 agosto)</p>
+        <p className="mt-2 text-sm text-[#8A7A5A]">Shanghai, China · Oriental Sports Center · El bracket se define tras la Fase de Grupos (13–16 agosto)</p>
       </div>
 
       {/* Pre-tournament notice */}
