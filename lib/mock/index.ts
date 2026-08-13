@@ -8,9 +8,9 @@ export { panchoRecommendations } from './pancho'
 import type { DataStatus } from '../types'
 
 export const dataStatus: DataStatus = {
-  source: 'MOCK',
-  label: 'DATOS MOCK',
-  lastUpdated: 'hace 8 segundos',
+  source: 'WAITING',
+  label: 'ESPERANDO DATOS EN VIVO',
+  lastUpdated: '—',
   connected: false,
 }
 
@@ -22,11 +22,4 @@ export const navItems = [
   { label: 'Simulador', href: '/simulator' },
   { label: 'Comunidad', href: '/community' },
   { label: 'Perfil', href: '/profile' },
-]
-
-export const tournamentStats = [
-  { label: 'Winrate promedio', value: '0.0%', change: '+0.0%' },
-  { label: 'Duración promedio', value: '00:00', change: '0:00' },
-  { label: 'Primera sangre', value: '0.0%', change: '+0.0%' },
-  { label: 'Héroe más pickeado', value: 'TBD', change: 'TBD picks' },
 ]

@@ -1,5 +1,5 @@
 import type { PanchoRecommendation } from '@/lib/types'
-import { AlertTriangle, Eye, Info, Sparkles } from 'lucide-react'
+import { AlertTriangle, Eye, Info } from 'lucide-react'
 
 export function PanchoCard({ recommendation, rec }: { recommendation?: PanchoRecommendation; rec?: PanchoRecommendation }) {
   const data = recommendation ?? rec!
@@ -14,12 +14,10 @@ export function PanchoCard({ recommendation, rec }: { recommendation?: PanchoRec
       <div className="p-4 pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2">
-            <div className="flex size-7 items-center justify-center rounded-lg bg-[rgba(212,175,55,0.12)] border border-[rgba(212,175,55,0.2)]">
-              <Sparkles className="size-3.5 text-[#D4AF37]" />
-            </div>
+            <div className="w-0.5 h-8 rounded-full bg-gradient-to-b from-[#D4AF37] to-[rgba(212,175,55,0.2)]" />
             <div>
               <p className="font-mono text-[9px] font-bold uppercase tracking-[0.25em] text-[#D4AF37]">
-                ✦ PANCHO ANALYSIS · {data.tag}
+                ANALISTA PANCHO · {data.tag}
               </p>
               <p className="text-sm font-bold leading-tight text-[#F5F1E8]">{data.title}</p>
             </div>

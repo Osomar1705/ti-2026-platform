@@ -15,5 +15,5 @@ export type PanchoRecommendation = { id: string; matchId?: string; tag: string; 
 export type Post = { id: string; userId: string; username: string; avatar: string; room: string; text: string; likes: number; replies: number; createdAt: string }
 export type ChatMessage = { id: string; userId: string; username: string; text: string; timestamp: string; reactions?: Record<string, number> }
 export type Prediction = { id: string; userId: string; matchId: string; predictedWinner: string; predictedScore: string; locked: boolean; correct?: boolean }
-export type DataSource = 'MOCK' | 'LIVE' | 'OFFICIAL' | 'SIMULATION'
+export type DataSource = 'MOCK' | 'LIVE' | 'OFFICIAL' | 'SIMULATION' | 'WAITING'
 export type DataStatus = { source: DataSource; label: string; lastUpdated: string; connected: boolean }

@@ -10,7 +10,6 @@ import {
   Menu,
   Radio,
   ShieldCheck,
-  Sparkles,
   Target,
   Trophy,
   UserRound,
@@ -112,16 +111,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Pancho promo card */}
-        <div className="mt-auto rounded-xl border border-[rgba(212,175,55,0.15)] bg-[rgba(212,175,55,0.04)] p-3">
+        <div className="mt-auto rounded-xl border border-[rgba(212,175,55,0.2)] bg-[rgba(212,175,55,0.04)] p-3" style={{ borderTop: '1px solid rgba(212,175,55,0.35)' }}>
           <div className="flex items-center gap-2">
-            <Sparkles className="size-4 text-[#D4AF37]" />
-            <span className="text-xs font-semibold text-[#F5F1E8]">Análisis de Pancho</span>
+            <div className="w-0.5 h-4 rounded-full bg-[#D4AF37]" />
+            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">Analista Pancho</span>
           </div>
           <p className="mt-2 text-[11px] leading-4 text-[#8A7A5A]">
             Picks, probabilidades y alertas de upset para el TI 2026.
           </p>
           <Link href="/predictions" className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-[#D4AF37]">
-            Ver análisis <ArrowUpRight className="size-3" />
+            Explorar picks <ArrowUpRight className="size-3" />
           </Link>
         </div>
 
