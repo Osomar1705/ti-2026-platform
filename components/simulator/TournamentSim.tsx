@@ -222,14 +222,12 @@ function computeSwissRecords(teamIds: string[], rounds: any[][]) {
   rounds.flat().forEach((m: any) => {
     if (!m.played) return
     if (m.scoreA > m.scoreB) {
-      rec[m.teamAId].wins++; rec[m.teamBId].losses++
+      if (rec[m.teamAId]) rec[m.teamAId].wins++; if (rec[m.teamBId]) rec[m.teamBId].losses++
     } else if (m.scoreB > m.scoreA) {
-      rec[m.teamBId].wins++; rec[m.teamAId].losses++
+      if (rec[m.teamBId]) rec[m.teamBId].wins++; if (rec[m.teamAId]) rec[m.teamAId].losses++
     }
-    rec[m.teamAId].gamesWon += m.scoreA; rec[m.teamAId].gamesLost += m.scoreB
-    rec[m.teamBId].gamesWon += m.scoreB; rec[m.teamBId].gamesLost += m.scoreA
-    rec[m.teamAId].opponents.push(m.teamBId)
-    rec[m.teamBId].opponents.push(m.teamAId)
+    if (rec[m.teamAId]) { rec[m.teamAId].gamesWon += m.scoreA; rec[m.teamAId].gamesLost += m.scoreB; rec[m.teamAId].opponents.push(m.teamBId) }
+    if (rec[m.teamBId]) { rec[m.teamBId].gamesWon += m.scoreB; rec[m.teamBId].gamesLost += m.scoreA; rec[m.teamBId].opponents.push(m.teamAId) }
   })
   return rec
 }
@@ -299,22 +297,22 @@ function generateEliminationRoundMatches(rankedIds: string[]) {
 /* ------------------------------------------------------------------ */
 const SWISS_ROUNDS = 5
 const TI_2026_TEAMS = [
-  'Team Falcons','Team Liquid','Iron Wing','Aurora Gaming','Team Yandex','BoomBoys','Xtreme Gaming',
-  'Team Spirit','Team Vision','HULIGANI','Nigma Galaxy','Team Resilience','Vici Gaming','OG','GamerLegion','LGD Gaming',
+  'Team Falcons','Team Liquid','Iron Wing','Aurora Gaming','Team Yandex','Boomboys','Xtreme Gaming',
+  'Team Spirit','Team Vision','Huligani','Nigma Galaxy','Team Resilience','Vici Gaming','OG Esports','GamerLegion','LGD Gaming',
 ]
 const TI_2026_ROUND1: [string, string, string][] = [
   ['Team Falcons','LGD Gaming','2026-08-13T10:00'],
   ['Iron Wing','Nigma Galaxy','2026-08-13T10:00'],
-  ['BoomBoys','OG','2026-08-13T10:00'],
+  ['Boomboys','OG Esports','2026-08-13T10:00'],
   ['Team Vision','Team Resilience','2026-08-13T10:00'],
   ['Team Spirit','Xtreme Gaming','2026-08-13T13:00'],
   ['Team Liquid','Vici Gaming','2026-08-13T13:00'],
   ['Aurora Gaming','GamerLegion','2026-08-13T13:00'],
-  ['Team Yandex','HULIGANI','2026-08-13T13:00'],
+  ['Team Yandex','Huligani','2026-08-13T13:00'],
 ]
 const TI_2026_INITIAL_GROUPS: Record<string, string[]> = {
-  G1: ['Team Falcons','LGD Gaming','Team Spirit','Xtreme Gaming','Iron Wing','Nigma Galaxy','Team Liquid','Vici Gaming'],
-  G2: ['BoomBoys','OG','Team Vision','Team Resilience','Aurora Gaming','GamerLegion','Team Yandex','HULIGANI'],
+  GA: ['Team Vision','Boomboys','Team Falcons','Iron Wing','Nigma Galaxy','LGD Gaming','OG Esports','Team Resilience'],
+  GB: ['Team Yandex','Aurora Gaming','Team Spirit','Team Liquid','Xtreme Gaming','Vici Gaming','GamerLegion','Huligani'],
 }
 const TI_2026_RULES = {
   tiebreakers: ['Porcentaje de partidas ganadas (games won %)','Total de partidos ganados por los rivales enfrentados','Porcentaje promedio de partidas ganadas por los rivales enfrentados','Duración promedio de partida (más corta es mejor)','Cara o sello'],
@@ -324,7 +322,7 @@ const TI_2026_RULES = {
 }
 const TI_2026_ROSTERS: Record<string, { nick: string; country: string }[]> = {
   'Aurora Gaming':[{nick:'Nightfall',country:'Rusia'},{nick:'Mikoto',country:'Indonesia'},{nick:'Ws',country:'Malasia'},{nick:'Mira',country:'Ucrania'},{nick:'kaori',country:'Ucrania'}],
-  'BoomBoys':[{nick:'Kiritych~',country:'Rusia'},{nick:'gpk',country:'Rusia'},{nick:'MieRo',country:'Rusia'},{nick:'Save-',country:'Moldavia'},{nick:'Kataomi',country:'Rusia'}],
+  'Boomboys':[{nick:'Kiritych~',country:'Rusia'},{nick:'gpk',country:'Rusia'},{nick:'MieRo',country:'Rusia'},{nick:'Save-',country:'Moldavia'},{nick:'Kataomi',country:'Rusia'}],
   'Team Falcons':[{nick:'skiter',country:'Eslovaquia'},{nick:'Malr1ne',country:'Rusia'},{nick:'ATF',country:'Jordania'},{nick:'Cr1t-',country:'Dinamarca'},{nick:'Sneyking',country:'Estados Unidos'}],
   'Team Liquid':[{nick:'m1CKe',country:'Suecia'},{nick:'Nisha',country:'Polonia'},{nick:'Ace',country:'Dinamarca'},{nick:'Boxi',country:'Suecia'},{nick:'tOfu',country:'Alemania'}],
   'Iron Wing':[{nick:'Pure',country:'Rusia'},{nick:'bzm',country:'Bulgaria'},{nick:'33',country:'Israel'},{nick:'Ari',country:'Reino Unido'},{nick:'Whitemon',country:'Indonesia'}],
@@ -333,10 +331,10 @@ const TI_2026_ROSTERS: Record<string, { nick: string; country: string }[]> = {
   'Team Spirit':[{nick:'Yatoro',country:'Ucrania'},{nick:'Larl',country:'Rusia'},{nick:'Collapse',country:'Rusia'},{nick:'not me',country:'Rusia'},{nick:'rue',country:'Rusia'}],
   'Team Vision':[{nick:'Satanic',country:'Rusia'},{nick:'No[o]ne-',country:'Ucrania'},{nick:'Noticed',country:'Rusia'},{nick:'9Class',country:'Rusia'},{nick:'Dukalis',country:'Rusia'}],
   'Nigma Galaxy':[{nick:'Suma1L-',country:'Pakistán'},{nick:'Lorenof',country:'Ucrania'},{nick:'Davai Lama',country:'Bélgica'},{nick:'OmaR',country:'Líbano'},{nick:'GH',country:'Líbano'}],
-  'HULIGANI':[{nick:'ssnovv1',country:'Rusia'},{nick:"Mirage`",country:'Kazajistán'},{nick:'Corrupted',country:'Rusia'},{nick:'sayuw',country:'Rusia'},{nick:'RESPECT',country:'Bielorrusia'}],
+  'Huligani':[{nick:'ssnovv1',country:'Rusia'},{nick:"Mirage`",country:'Kazajistán'},{nick:'Corrupted',country:'Rusia'},{nick:'sayuw',country:'Rusia'},{nick:'RESPECT',country:'Bielorrusia'}],
   'Team Resilience':[{nick:'Erika',country:'China'},{nick:'EchozZ',country:'China'},{nick:'niu',country:'China'},{nick:'planet',country:'China'},{nick:'zzq',country:'China'}],
   'Vici Gaming':[{nick:'shiro',country:'China'},{nick:'Xm',country:'China'},{nick:'Bach',country:'China'},{nick:'XinQ',country:'China'},{nick:"y`",country:'China'}],
-  'OG':[{nick:'Natsumi-',country:'Filipinas'},{nick:'Yopaj-',country:'Filipinas'},{nick:"Raven^",country:'Filipinas'},{nick:'TIMS',country:'Filipinas'},{nick:'skem',country:'Filipinas'}],
+  'OG Esports':[{nick:'Natsumi-',country:'Filipinas'},{nick:'Yopaj-',country:'Filipinas'},{nick:"Raven^",country:'Filipinas'},{nick:'TIMS',country:'Filipinas'},{nick:'skem',country:'Filipinas'}],
   'LGD Gaming':[{nick:'Yuma',country:'Nicaragua'},{nick:'Topson',country:'Finlandia'},{nick:'Wisper',country:'Bolivia'},{nick:'Thiolicor',country:'Brasil'},{nick:'KJ',country:'Brasil'}],
   'GamerLegion':[{nick:'Ghost',country:'Malasia'},{nick:'RCY',country:'Estados Unidos'},{nick:'Fayde',country:'Estados Unidos'},{nick:'Bignum',country:'Ucrania'},{nick:'Speeed',country:'Estados Unidos'}],
 }
@@ -346,8 +344,8 @@ function buildTI2026() {
   const byName = Object.fromEntries(teams.map((t) => [t.name, t.id]))
   const round1 = TI_2026_ROUND1.map(([a, b, date]) => ({ id: uid(), teamAId: byName[a], teamBId: byName[b], scoreA: 0, scoreB: 0, played: false, date }))
   const initialGroupOf: Record<string, string> = {}
-  TI_2026_INITIAL_GROUPS.G1.forEach((n) => { initialGroupOf[byName[n]] = 'G1' })
-  TI_2026_INITIAL_GROUPS.G2.forEach((n) => { initialGroupOf[byName[n]] = 'G2' })
+  TI_2026_INITIAL_GROUPS.GA.forEach((n) => { initialGroupOf[byName[n]] = 'GA' })
+  TI_2026_INITIAL_GROUPS.GB.forEach((n) => { initialGroupOf[byName[n]] = 'GB' })
   const prizePool = [
     { place: 'Total', amount: '$2,905,798 USD' },
     { place: '1°',    amount: 'A definir' },
@@ -845,12 +843,15 @@ function TIStageView({ tournament, updateTournament, setTab }: any) {
   const nextSwissRound = () => {
     const nextRoundNumber = rounds.length + 1
     const groupOf = tournament.initialGroupOf
+    // Excluir equipos clasificados (4+ victorias) del pool activo
+    const fullRecords = computeSwissRecords(teamIds, rounds)
+    const activeIds = teamIds.filter((id: string) => fullRecords[id].wins < 4)
     let pairFilter: ((a: string, b: string) => boolean) | null = null
     if (groupOf) {
       if (nextRoundNumber === 2 || nextRoundNumber === 3) pairFilter = (a, b) => groupOf[a] === groupOf[b]
       else if (nextRoundNumber === 4) pairFilter = (a, b) => groupOf[a] !== groupOf[b]
     }
-    updateTournament({ ...tournament, swiss: { rounds: [...rounds, generateSwissRound(teamIds, rounds, pairFilter)] } })
+    updateTournament({ ...tournament, swiss: { rounds: [...rounds, generateSwissRound(activeIds, rounds, pairFilter)] } })
   }
 
   const simulateCurrentRound = () => {
@@ -874,7 +875,11 @@ function TIStageView({ tournament, updateTournament, setTab }: any) {
         <tbody>
           {standings.map((row: any, i: number) => {
             let status: string | null = null, color = C.text
-            if (swissDone) {
+            const groupOf = tournament.initialGroupOf
+            const groupLabel = groupOf ? (groupOf[row.teamId] === 'GA' ? ' [A]' : ' [B]') : ''
+            if (row.wins >= 4) {
+              status = '🟢 CLASIFICADO'; color = C.radiant
+            } else if (swissDone) {
               if (i < 3) { status = 'directo a Main Event'; color = C.radiant }
               else if (i < 13) {
                 const em = tournament.eliminationRound?.find((m: any) => m.teamAId === row.teamId || m.teamBId === row.teamId)
@@ -882,7 +887,7 @@ function TIStageView({ tournament, updateTournament, setTab }: any) {
                 else { status = 'ronda de eliminación'; color = C.text }
               } else { status = 'eliminado'; color = C.dire }
             }
-            return <tr key={row.teamId}><td style={s.td}>{i + 1}</td><td style={{ ...s.td, textAlign: 'left', fontWeight: 600, color }}>{row.name}</td><td style={s.td}>{row.wins}</td><td style={s.td}>{row.losses}</td><td style={{ ...s.td, fontSize: 11, color }}>{status || '—'}</td></tr>
+            return <tr key={row.teamId}><td style={s.td}>{i + 1}</td><td style={{ ...s.td, textAlign: 'left', fontWeight: 600, color }}>{row.name}<span style={{ fontSize: 10, color: '#555', fontWeight: 400 }}>{groupLabel}</span></td><td style={s.td}>{row.wins}</td><td style={s.td}>{row.losses}</td><td style={{ ...s.td, fontSize: 11, color }}>{status || '—'}</td></tr>
           })}
         </tbody>
       </table>
@@ -1091,17 +1096,17 @@ function GroupsSplitView({ tournament }: any) {
   const groupOf = tournament.initialGroupOf
   if (!groupOf) return <p style={{ fontSize: 13, color: C.muted }}>Este torneo no tiene grupos iniciales definidos.</p>
   const groups: Record<string, any[]> = {
-    G1: tournament.teams.filter((t: any) => groupOf[t.id] === 'G1'),
-    G2: tournament.teams.filter((t: any) => groupOf[t.id] === 'G2'),
+    GA: tournament.teams.filter((t: any) => groupOf[t.id] === 'GA'),
+    GB: tournament.teams.filter((t: any) => groupOf[t.id] === 'GB'),
   }
   return (
     <div>
-      <h3 style={s.h3}>División de grupos iniciales (fase suiza)</h3>
-      <p style={{ fontSize: 12, color: C.muted, marginTop: -4, marginBottom: 14 }}>Reconstruido a partir de la organización de streams del Día 1. Rondas 2-3: mismo grupo. Ronda 4: cruzada obligatoria.</p>
+      <h3 style={s.h3}>División de grupos (fase suiza)</h3>
+      <p style={{ fontSize: 12, color: C.muted, marginTop: -4, marginBottom: 14 }}>Grupos oficiales TI 2026. Rondas 1-3: solo intra-grupo. Ronda 4: cruzada obligatoria. Ronda 5: suizo estándar. 4 victorias = clasificado automáticamente.</p>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-        {['G1', 'G2'].map((g) => (
+        {['GA', 'GB'].map((g) => (
           <div key={g} style={{ ...s.card, cursor: 'default' }}>
-            <div style={{ fontWeight: 700, marginBottom: 6, color: C.gold }}>Grupo {g === 'G1' ? '1' : '2'}</div>
+            <div style={{ fontWeight: 700, marginBottom: 6, color: C.gold }}>Group {g === 'GA' ? 'A' : 'B'}</div>
             {groups[g].map((t: any) => <div key={t.id} style={{ fontSize: 13, color: C.text, padding: '2px 0' }}>{t.name}</div>)}
           </div>
         ))}
