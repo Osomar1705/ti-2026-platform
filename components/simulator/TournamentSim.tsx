@@ -107,43 +107,37 @@ function mkDEMatch(links: any[], date?: string | null) {
   return { id: uid(), teamAId: null, teamBId: null, scoreA: 0, scoreB: 0, played: false, date: date || null, links: links || [] }
 }
 
+// Correct 8-team double-elimination bracket (4 R1 pairs → UB+LB+GF)
+// UB: R1(4), SF(2), Final(1)
+// LB: R1(2 UBR1 losers), R2(2: LBR1 winners vs UB SF losers), R3(1), LB Final(1)
+// Grand Final: UB winner vs LB winner
 function generateDoubleElimN(round1Pairs: [string, string][]) {
-  const k = Math.round(Math.log2(round1Pairs.length)) + 1
-  const ub: any[][] = [round1Pairs.map(([a, b]) => ({ ...mkDEMatch([]), teamAId: a, teamBId: b }))]
-  let count = ub[0].length
-  while (count > 1) {
-    count = count / 2
-    const r = ub.length
-    ub.push(Array.from({ length: count }, (_, i) => mkDEMatch([
-      { type: 'winner', bracket: 'ub', round: r - 1, idx: i * 2 },
-      { type: 'winner', bracket: 'ub', round: r - 1, idx: i * 2 + 1 },
-    ])))
-  }
-  const pairSelfLinks = (links: any[]) => { const out: any[] = []; for (let i = 0; i < links.length; i += 2) out.push(mkDEMatch([links[i], links[i + 1]])); return out }
-  const pairCrossLinks = (linksA: any[], linksB: any[]) => linksA.map((la, i) => mkDEMatch([la, linksB[i]]))
-  const lb: any[][] = []
-  let currentWinnerLinks: any[] | null = null
-  for (let i = 0; i <= k - 2; i++) {
-    const ubLoserLinks = ub[i].map((_: any, idx: number) => ({ type: 'loser', bracket: 'ub', round: i, idx }))
-    const round: any[] = currentWinnerLinks === null ? pairSelfLinks(ubLoserLinks) : pairCrossLinks(currentWinnerLinks, ubLoserLinks)
-    lb.push(round)
-    currentWinnerLinks = round.map((_: any, idx: number) => ({ type: 'winner', bracket: 'lb', round: lb.length - 1, idx }))
-    if (round.length > 1 && i < k - 2) {
-      const consolidate = pairSelfLinks(currentWinnerLinks as any[])
-      lb.push(consolidate)
-      currentWinnerLinks = consolidate.map((_: any, idx: number) => ({ type: 'winner', bracket: 'lb', round: lb.length - 1, idx }))
-    }
-  }
-  while ((currentWinnerLinks as any[]).length > 1) {
-    const consolidate = pairSelfLinks(currentWinnerLinks!)
-    lb.push(consolidate)
-    currentWinnerLinks = consolidate.map((_: any, idx: number) => ({ type: 'winner', bracket: 'lb', round: lb.length - 1, idx }))
-  }
-  const ubFinalLoserLink = { type: 'loser', bracket: 'ub', round: k - 1, idx: 0 }
-  const finalRound = pairCrossLinks(currentWinnerLinks!, [ubFinalLoserLink])
-  lb.push(finalRound)
-  const lbFinalWinnerLink = { type: 'winner', bracket: 'lb', round: lb.length - 1, idx: 0 }
-  const grandFinal = [mkDEMatch([{ type: 'winner', bracket: 'ub', round: k - 1, idx: 0 }, lbFinalWinnerLink])]
+  const L = (type: string, bracket: string, round: number, idx: number) => ({ type, bracket, round, idx })
+  const ub: any[][] = [
+    round1Pairs.map(([a, b]) => ({ ...mkDEMatch([]), teamAId: a, teamBId: b })),
+    [
+      mkDEMatch([L('winner','ub',0,0), L('winner','ub',0,1)]),
+      mkDEMatch([L('winner','ub',0,2), L('winner','ub',0,3)]),
+    ],
+    [mkDEMatch([L('winner','ub',1,0), L('winner','ub',1,1)])],
+  ]
+  const lb: any[][] = [
+    // LB R1: pair UB R1 losers
+    [
+      mkDEMatch([L('loser','ub',0,0), L('loser','ub',0,1)]),
+      mkDEMatch([L('loser','ub',0,2), L('loser','ub',0,3)]),
+    ],
+    // LB R2: LB R1 winners vs UB SF losers
+    [
+      mkDEMatch([L('winner','lb',0,0), L('loser','ub',1,0)]),
+      mkDEMatch([L('winner','lb',0,1), L('loser','ub',1,1)]),
+    ],
+    // LB R3: LB R2 winners face each other
+    [mkDEMatch([L('winner','lb',1,0), L('winner','lb',1,1)])],
+    // LB Final: LB R3 winner vs UB Final loser
+    [mkDEMatch([L('winner','lb',2,0), L('loser','ub',2,0)])],
+  ]
+  const grandFinal = [mkDEMatch([L('winner','ub',2,0), L('winner','lb',3,0)])]
   return recomputeDoubleElimGeneric({ ub, lb, grandFinal })
 }
 
@@ -750,6 +744,26 @@ function ConnectorSvg({ pos, edges, width, height }: any) {
   return <svg width={width} height={height} style={{ position: 'absolute', top: 0, left: 0 }}>{paths}</svg>
 }
 
+function simulateBracketFull(bracket: any): any {
+  // Simulate all matches in order: UB rounds, LB rounds, GF — propagating results
+  let b = { ub: bracket.ub.map((r: any[]) => r.map((m: any) => ({...m}))), lb: bracket.lb.map((r: any[]) => r.map((m: any) => ({...m}))), grandFinal: bracket.grandFinal.map((m: any) => ({...m})) }
+  const simMatch = (m: any) => {
+    if (m.played || !m.teamAId || !m.teamBId) return m
+    const flip = Math.random() > 0.5
+    return { ...m, scoreA: flip ? 2 : 1, scoreB: flip ? 1 : 2, played: true }
+  }
+  for (let r = 0; r < b.ub.length; r++) {
+    b.ub[r] = b.ub[r].map(simMatch)
+    b = recomputeDoubleElimGeneric(b)
+  }
+  for (let r = 0; r < b.lb.length; r++) {
+    b.lb[r] = b.lb[r].map(simMatch)
+    b = recomputeDoubleElimGeneric(b)
+  }
+  b.grandFinal = b.grandFinal.map(simMatch)
+  return recomputeDoubleElimGeneric(b)
+}
+
 function DoubleElimBracketView({ bracket, teamsById, onUpdate }: any) {
   const setResult = (bracketKey: string, round: number, idx: number, scoreA: number, scoreB: number) => {
     const updated = { ...bracket }
@@ -758,10 +772,16 @@ function DoubleElimBracketView({ bracket, teamsById, onUpdate }: any) {
     onUpdate(recomputeDoubleElimGeneric(updated))
   }
   const champion = bracket.grandFinal[0].played ? (bracket.grandFinal[0].scoreA > bracket.grandFinal[0].scoreB ? bracket.grandFinal[0].teamAId : bracket.grandFinal[0].teamBId) : null
+  const allDone = bracket.grandFinal[0].played
   const { pos, edges, headers, width, height } = buildDELayout(bracket)
   return (
     <div>
-      {champion && <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, padding: '12px 16px', background: C.gold + '18', border: `1px solid ${C.gold}44`, borderRadius: 8 }}><Trophy size={20} color={C.gold} /><span style={{ fontWeight: 700, color: C.gold }}>Campeón: {teamsById[champion]?.name}</span></div>}
+      {champion && <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, padding: '12px 16px', background: C.gold + '18', border: `1px solid ${C.gold}44`, borderRadius: 8 }}><Trophy size={20} color={C.gold} /><span style={{ fontWeight: 700, color: C.gold }}>🏆 Campeón TI 2026: {teamsById[champion]?.name}</span></div>}
+      {!allDone && (
+        <button onClick={() => onUpdate(simulateBracketFull(bracket))} style={{ ...s.saveBtn, marginBottom: 12, fontSize: 12 }}>
+          <RefreshCw size={13} /> Simular Main Event completo
+        </button>
+      )}
       <div style={{ overflowX: 'auto', paddingBottom: 12 }}>
         <div style={{ position: 'relative', width, height }}>
           {headers.map((h: any, i: number) => (
@@ -937,6 +957,14 @@ function EliminationRoundView({ tournament, updateTournament }: any) {
     updateTournament({ ...tournament, eliminationRound: tournament.eliminationRound.map((m: any) => m.id === matchId ? { ...m, scoreA, scoreB, played: true } : m) })
   const setElimDate = (matchId: string, date: string | null) =>
     updateTournament({ ...tournament, eliminationRound: tournament.eliminationRound.map((m: any) => m.id === matchId ? { ...m, date } : m) })
+  const simulateElimRound = () => {
+    const simulated = tournament.eliminationRound.map((m: any) => {
+      if (m.played) return m
+      const flip = Math.random() > 0.5
+      return { ...m, scoreA: flip ? 2 : 1, scoreB: flip ? 1 : 2, played: true }
+    })
+    updateTournament({ ...tournament, eliminationRound: simulated })
+  }
   const startMainEvent = () => {
     const top3 = standings.slice(0, 3).map((s: any) => s.teamId)
     const elimWinners = tournament.eliminationRound.map((m: any) => m.scoreA > m.scoreB ? m.teamAId : m.teamBId)
@@ -961,6 +989,11 @@ function EliminationRoundView({ tournament, updateTournament }: any) {
       {tournament.eliminationRound && sortByDate(tournament.eliminationRound).map((m: any) => (
         <MatchRow key={m.id} match={m} teamsById={teamsById} onSave={(sa: number, sb: number) => setElimResult(m.id, sa, sb)} onDateChange={(date: string | null) => setElimDate(m.id, date)} />
       ))}
+      {tournament.eliminationRound && !elimDone && (
+        <button onClick={simulateElimRound} style={{ ...s.saveBtn, marginTop: 8, fontSize: 12 }}>
+          <RefreshCw size={13} /> Simular pendientes
+        </button>
+      )}
       {elimDone && !tournament.bracket && <button onClick={startMainEvent} style={{ ...s.primaryBtn, marginTop: 8 }}><Trophy size={16} /> Generar Main Event</button>}
       {tournament.bracket && <div style={{ marginTop: 28 }}><DoubleElimBracketView bracket={tournament.bracket} teamsById={teamsById} onUpdate={(b: any) => updateTournament({ ...tournament, bracket: b })} /></div>}
     </div>
