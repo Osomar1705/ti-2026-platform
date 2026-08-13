@@ -217,12 +217,19 @@ function applyDate(matches: any[], byName: Record<string, string>, nameA: string
 /*  Motor suizo                                                          */
 /* ------------------------------------------------------------------ */
 function computeSwissRecords(teamIds: string[], rounds: any[][]) {
-  const rec: Record<string, { wins: number; losses: number }> = {}
-  teamIds.forEach((id) => (rec[id] = { wins: 0, losses: 0 }))
+  const rec: Record<string, { wins: number; losses: number; gamesWon: number; gamesLost: number; opponents: string[] }> = {}
+  teamIds.forEach((id) => (rec[id] = { wins: 0, losses: 0, gamesWon: 0, gamesLost: 0, opponents: [] }))
   rounds.flat().forEach((m: any) => {
     if (!m.played) return
-    if (m.scoreA > m.scoreB) { rec[m.teamAId].wins++; rec[m.teamBId].losses++ }
-    else if (m.scoreB > m.scoreA) { rec[m.teamBId].wins++; rec[m.teamAId].losses++ }
+    if (m.scoreA > m.scoreB) {
+      rec[m.teamAId].wins++; rec[m.teamBId].losses++
+    } else if (m.scoreB > m.scoreA) {
+      rec[m.teamBId].wins++; rec[m.teamAId].losses++
+    }
+    rec[m.teamAId].gamesWon += m.scoreA; rec[m.teamAId].gamesLost += m.scoreB
+    rec[m.teamBId].gamesWon += m.scoreB; rec[m.teamBId].gamesLost += m.scoreA
+    rec[m.teamAId].opponents.push(m.teamBId)
+    rec[m.teamBId].opponents.push(m.teamAId)
   })
   return rec
 }
@@ -237,10 +244,16 @@ function generateSwissRound(teamIds: string[], previousRounds: any[][], pairFilt
   const pairs: [string, string][] = []
   let leftover: string[] = []
   const pickOpponent = (a: string, pool: string[]) => {
+    // Best: no rematch + passes filter
     let idx = pool.findIndex((b) => !playedPairs.has([a, b].sort().join('|')) && (!pairFilter || pairFilter(a, b)))
-    if (idx === -1 && pairFilter) idx = pool.findIndex((b) => pairFilter(a, b))
-    if (idx === -1) idx = 0
-    return idx
+    if (idx !== -1) return idx
+    // Fallback 1: allow rematch but keep filter (avoid same-group in R4 etc.)
+    if (pairFilter) idx = pool.findIndex((b) => pairFilter(a, b))
+    if (idx !== -1) return idx
+    // Fallback 2: look across the whole remaining pool ignoring filter (last resort)
+    idx = pool.findIndex((b) => !playedPairs.has([a, b].sort().join('|')))
+    if (idx !== -1) return idx
+    return 0
   }
   winsKeys.forEach((w) => {
     let pool = [...leftover, ...buckets[w]]
@@ -260,8 +273,18 @@ function generateSwissRound(teamIds: string[], previousRounds: any[][], pairFilt
 
 function swissStandings(teamIds: string[], rounds: any[][], teamsById: Record<string, any>) {
   const records = computeSwissRecords(teamIds, rounds)
-  return teamIds.map((id) => ({ teamId: id, name: teamsById[id]?.name || '?', ...records[id] }))
-    .sort((a, b) => (b.wins - b.losses) - (a.wins - a.losses) || b.wins - a.wins)
+  // Buchholz: sum of opponents' series wins
+  const buchholz = (id: string) => records[id].opponents.reduce((acc, opp) => acc + (records[opp]?.wins ?? 0), 0)
+  // Game win %
+  const gwp = (id: string) => { const t = records[id].gamesWon + records[id].gamesLost; return t > 0 ? records[id].gamesWon / t : 0 }
+  return teamIds
+    .map((id) => ({ teamId: id, name: teamsById[id]?.name || '?', ...records[id] }))
+    .sort((a, b) =>
+      (b.wins - a.wins) ||                    // 1. series ganadas
+      (a.losses - b.losses) ||               // 2. series perdidas (menos es mejor)
+      (buchholz(b.teamId) - buchholz(a.teamId)) || // 3. Buchholz (wins de oponentes)
+      (gwp(b.teamId) - gwp(a.teamId))        // 4. game win %
+    )
 }
 
 function generateEliminationRoundMatches(rankedIds: string[]) {
