@@ -32,14 +32,15 @@ function TeamScore({ name, tag, kills, netWorth, isRadiant }: {
   name: string; tag: string; kills: number; netWorth?: number; isRadiant: boolean
 }) {
   const color = isRadiant ? '#4ADE80' : '#F87171'
+  const isGeneric = name === 'Radiant' || name === 'Dire'
+  const displayName = isGeneric ? (isRadiant ? '🟢 Radiant' : '🔴 Dire') : name
   return (
     <div className="flex flex-col items-center gap-1 flex-1">
-      <div style={{ fontSize: 11, color: '#8A7A5A', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-        {isRadiant ? 'RADIANT' : 'DIRE'}
+      <div style={{ fontSize: 22, fontWeight: 800, color: isGeneric ? '#8A7A5A' : '#F5F1E8', letterSpacing: '-0.01em', textAlign: 'center' }}>
+        {displayName}
       </div>
-      <div style={{ fontSize: 22, fontWeight: 800, color: '#F5F1E8', letterSpacing: '-0.01em' }}>{name}</div>
       <div style={{ fontFamily: 'monospace', fontSize: 52, fontWeight: 900, color, lineHeight: 1 }}>{kills}</div>
-      {netWorth != null && (
+      {netWorth != null && netWorth > 0 && (
         <div style={{ fontSize: 12, color: '#8A7A5A' }}>
           NW: <span style={{ color: '#D4AF37', fontWeight: 600 }}>{fmtGold(netWorth)}</span>
         </div>

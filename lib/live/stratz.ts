@@ -6,11 +6,18 @@ import { heroName } from './hero-names'
 
 const OPENDOTA_URL = 'https://api.opendota.com/api/live'
 
+// Equipos TI 2026 — hardcoded para resolver nombres sin team_id en el live feed
+const TI_2026_TEAMS: Record<string, { name: string; tag: string }> = {
+  // Se puebla con IDs reales de OpenDota cuando estén disponibles
+}
+
 function parseTeam(raw: any, kills: number, fallback: string): LiveTeam {
+  const teamId = raw?.team_id ?? raw?.teamId ?? null
+  const fromMap = teamId ? TI_2026_TEAMS[String(teamId)] : null
   return {
-    teamId: raw?.team_id ?? raw?.teamId ?? null,
-    name: raw?.team_name ?? raw?.name ?? fallback,
-    tag: raw?.team_tag ?? raw?.tag ?? fallback.slice(0, 4).toUpperCase(),
+    teamId,
+    name: fromMap?.name ?? raw?.team_name ?? raw?.name ?? fallback,
+    tag:  fromMap?.tag  ?? raw?.team_tag  ?? raw?.tag  ?? fallback.slice(0, 4).toUpperCase(),
     kills,
   }
 }
@@ -44,6 +51,11 @@ export async function fetchStratzLive(leagueId?: number): Promise<LiveMatch[]> {
   if (!res.ok) throw new Error(`OpenDota ${res.status}`)
 
   const rawMatches: any[] = await res.json()
+
+  // Log para debug: ver qué league_ids hay en los matches actuales
+  const leagueIds = [...new Set(rawMatches.map((m: any) => m.league_id))]
+  console.log('[live] league_ids activos:', leagueIds)
+
   const now = Date.now()
 
   return rawMatches
