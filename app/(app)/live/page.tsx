@@ -7,7 +7,7 @@ import LiveStreamPlayer from '@/components/simulator/LiveStreamPlayer'
 
 const tournamentStreams = {
   twitch: 'dota2ti_es',
-  youtube: 'TGmnhNbna8Q',
+  youtube: 'nU5mLup2s7Q',
   kick: 'dotati'
 }
 
