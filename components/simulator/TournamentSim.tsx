@@ -802,7 +802,7 @@ function DoubleElimBracketView({ bracket, teamsById, onUpdate }: any) {
 /* ------------------------------------------------------------------ */
 /*  TI Swiss View                                                     */
 /* ------------------------------------------------------------------ */
-function TIStageView({ tournament, updateTournament }: any) {
+function TIStageView({ tournament, updateTournament, setTab }: any) {
   const teamsById = Object.fromEntries(tournament.teams.map((t: any) => [t.id, t]))
   const teamIds = tournament.teams.map((t: any) => t.id)
   const rounds = tournament.swiss.rounds
@@ -934,14 +934,24 @@ function TIStageView({ tournament, updateTournament }: any) {
           </div>
         )
       })()}
-      {swissDone && <p style={{ fontSize: 12, color: C.muted, marginTop: 8 }}>Fase suiza completa. Ve a la pestaña "Elimination Round" para continuar.</p>}
+      {swissDone && (
+        <div style={{ marginTop: 16, padding: '14px 16px', borderRadius: 10, border: `1px solid ${C.gold}55`, background: C.gold + '0e', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <div>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: C.gold }}>✓ Fase suiza completa</p>
+            <p style={{ margin: '4px 0 0', fontSize: 12, color: C.muted }}>Los puestos 1-3 avanzan directo al Main Event. Los puestos 4-13 juegan la Ronda de Eliminación.</p>
+          </div>
+          <button onClick={() => setTab('elimination')} style={{ ...s.primaryBtn, whiteSpace: 'nowrap' }}>
+            <ListTree size={15} /> Ir a Ronda de Eliminación
+          </button>
+        </div>
+      )}
     </div>
   )
 }
 /* ------------------------------------------------------------------ */
 /*  Elimination Round                                                    */
 /* ------------------------------------------------------------------ */
-function EliminationRoundView({ tournament, updateTournament }: any) {
+function EliminationRoundView({ tournament, updateTournament, setTab }: any) {
   const teamsById = Object.fromEntries(tournament.teams.map((t: any) => [t.id, t]))
   const teamIds = tournament.teams.map((t: any) => t.id)
   const rounds = tournament.swiss.rounds
@@ -977,6 +987,7 @@ function EliminationRoundView({ tournament, updateTournament }: any) {
       [seeds[3], seeds[4]],
     ]
     updateTournament({ ...tournament, bracket: generateDoubleElimN(round1Pairs) })
+    setTab('bracket')
   }
   const elimDone = tournament.eliminationRound?.every((m: any) => m.played)
 
@@ -1199,8 +1210,8 @@ function TournamentDetail({ tournament, updateTournament, onBack, onDelete }: an
       {(tournament.format === 'groups' || (tournament.format === 'both' && tab === 'groups')) && <GroupsView tournament={tournament} updateTournament={updateTournament} />}
       {tournament.format === 'bracket' && tournament.bracket && <BracketView bracket={tournament.bracket} teamsById={teamsById} onUpdateBracket={(b: any) => updateTournament({ ...tournament, bracket: b })} />}
       {tournament.format === 'both' && tab === 'bracket' && tournament.bracket && <BracketView bracket={tournament.bracket} teamsById={teamsById} onUpdateBracket={(b: any) => updateTournament({ ...tournament, bracket: b })} />}
-      {tournament.format === 'ti_swiss' && tab === 'groups' && <TIStageView tournament={tournament} updateTournament={updateTournament} />}
-      {tournament.format === 'ti_swiss' && tab === 'elimination' && <EliminationRoundView tournament={tournament} updateTournament={updateTournament} />}
+      {tournament.format === 'ti_swiss' && tab === 'groups' && <TIStageView tournament={tournament} updateTournament={updateTournament} setTab={setTab} />}
+      {tournament.format === 'ti_swiss' && tab === 'elimination' && <EliminationRoundView tournament={tournament} updateTournament={updateTournament} setTab={setTab} />}
       {tournament.format === 'ti_swiss' && tab === 'bracket' && tournament.bracket && <DoubleElimBracketView bracket={tournament.bracket} teamsById={teamsById} onUpdate={(b: any) => updateTournament({ ...tournament, bracket: b })} />}
       {tab === 'rosters' && <RostersView tournament={tournament} />}
       {tab === 'prizepool' && tournament.prizePool && <PrizePoolView prizePool={tournament.prizePool} />}
