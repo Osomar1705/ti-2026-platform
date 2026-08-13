@@ -28,9 +28,10 @@ export async function getLiveData(): Promise<LiveApiResponse> {
   }
 
   try {
+    // TI 2026 league ID en OpenDota — hardcoded para garantizar el filtro
     const leagueId = process.env.TI_2026_LEAGUE_ID
       ? parseInt(process.env.TI_2026_LEAGUE_ID, 10)
-      : undefined
+      : 19719
 
     const matches = await fetchStratzLive(leagueId)
 
