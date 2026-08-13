@@ -810,6 +810,19 @@ function TIStageView({ tournament, updateTournament }: any) {
     updateTournament({ ...tournament, swiss: { rounds: [...rounds, generateSwissRound(teamIds, rounds, pairFilter)] } })
   }
 
+  const simulateCurrentRound = () => {
+    const ri = rounds.length - 1
+    const newRounds = rounds.map((r: any[], i: number) => {
+      if (i !== ri) return r
+      return r.map((m: any) => {
+        if (m.played) return m
+        const flip = Math.random() > 0.5
+        return { ...m, scoreA: flip ? 2 : 1, scoreB: flip ? 1 : 2, played: true }
+      })
+    })
+    updateTournament({ ...tournament, swiss: { rounds: newRounds } })
+  }
+
   return (
     <div>
       <h3 style={s.h3}>Fase suiza · ronda {rounds.length} de {SWISS_ROUNDS}</h3>
@@ -854,22 +867,53 @@ function TIStageView({ tournament, updateTournament }: any) {
       })}
 
       {/* Generate next round button */}
-      {!swissDone && rounds.length < SWISS_ROUNDS && (
-        <div style={{ marginTop: 8 }}>
-          <button
-            onClick={nextSwissRound}
-            disabled={!currentRoundPlayed}
-            style={{ ...s.primaryBtn, opacity: currentRoundPlayed ? 1 : 0.4, cursor: currentRoundPlayed ? 'pointer' : 'not-allowed' }}
-          >
-            <Layers size={16} /> Generar ronda {rounds.length + 1}
-          </button>
-          {!currentRoundPlayed && (
-            <p style={{ fontSize: 12, color: C.muted, marginTop: 6 }}>
-              Guarda todos los resultados de la ronda {rounds.length} primero — los scores se auto-guardan 0.6s después de ingresar un resultado claro.
-            </p>
-          )}
-        </div>
-      )}
+      {!swissDone && rounds.length < SWISS_ROUNDS && (() => {
+        const ri = rounds.length - 1
+        const cur = rounds[ri]
+        const played = cur.filter((m: any) => m.played).length
+        const total = cur.length
+        const missing = total - played
+        return (
+          <div style={{ marginTop: 12, padding: '12px 14px', borderRadius: 8, border: `1px solid ${C.border}`, background: C.surface }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span style={{ fontSize: 12, color: C.muted }}>
+                Ronda {rounds.length}:
+              </span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: currentRoundPlayed ? C.radiant : C.gold }}>
+                {played}/{total} resultados guardados
+              </span>
+              {missing > 0 && (
+                <span style={{ fontSize: 11, color: C.dire }}>
+                  — faltan {missing}
+                </span>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <button
+                onClick={nextSwissRound}
+                disabled={!currentRoundPlayed}
+                style={{ ...s.primaryBtn, opacity: currentRoundPlayed ? 1 : 0.35, cursor: currentRoundPlayed ? 'pointer' : 'not-allowed', fontSize: 13 }}
+              >
+                <Layers size={15} /> Generar ronda {rounds.length + 1}
+              </button>
+              {!currentRoundPlayed && (
+                <button
+                  onClick={simulateCurrentRound}
+                  style={{ ...s.saveBtn, fontSize: 12, padding: '6px 12px', gap: 5 }}
+                  title="Simula los partidos pendientes con resultados aleatorios"
+                >
+                  <RefreshCw size={13} /> Simular pendientes
+                </button>
+              )}
+            </div>
+            {!currentRoundPlayed && (
+              <p style={{ fontSize: 11, color: C.faint, marginTop: 6 }}>
+                Ingresa los {missing} resultado(s) pendiente(s) manualmente, o usa "Simular pendientes" para continuar.
+              </p>
+            )}
+          </div>
+        )
+      })()}
       {swissDone && <p style={{ fontSize: 12, color: C.muted, marginTop: 8 }}>Fase suiza completa. Ve a la pestaña "Elimination Round" para continuar.</p>}
     </div>
   )
