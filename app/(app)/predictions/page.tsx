@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { matches } from '@/lib/mock'
 import { Surface, SectionTitle, TeamMark } from '@/components/shared/ui'
 import type { Prediction } from '@/lib/types'
@@ -12,7 +12,14 @@ import Link from 'next/link'
 export default function PredictionsPage() {
   const { user } = useUser()
   const userId = user?.username ?? 'anon'
-  const [predictions, setPredictions] = useState<Prediction[]>([])
+  const [predictions, setPredictions] = useState<Prediction[]>(() => {
+    if (typeof window === 'undefined') return []
+    try { return JSON.parse(localStorage.getItem('predictions') || '[]') } catch { return [] }
+  })
+
+  useEffect(() => {
+    localStorage.setItem('predictions', JSON.stringify(predictions))
+  }, [predictions])
   const upcomingMatches = matches.filter((m) => m.status === 'upcoming')
 
   function setPrediction(matchId: string, winner: string, score: string) {
