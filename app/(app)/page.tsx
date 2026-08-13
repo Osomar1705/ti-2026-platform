@@ -8,7 +8,8 @@ import { teams } from '@/lib/mock/teams'
 import { useUser } from '@/lib/hooks/useUser'
 import { Surface, SectionTitle, TeamMark } from '@/components/shared/ui'
 
-const TI_START = new Date('2026-08-13T02:00:00Z') // 10:00 AM CST (Shanghai, UTC+8)
+const TI_START = new Date('2026-08-13T02:00:00Z') // Primera partida: 21:00 GMT-5 Aug 12 = 02:00 UTC Aug 13
+const MAIN_EVENT_START = new Date('2026-08-19T00:00:00Z') // Main Event: 19 agosto, Shanghai
 
 function useCountdown(target: Date) {
   const [diff, setDiff] = useState(() => Math.max(0, target.getTime() - Date.now()))
@@ -71,12 +72,22 @@ export default function Page() {
           <h1 className="text-5xl font-black tracking-tight text-[#F5F1E8] md:text-7xl">THE INTERNATIONAL</h1>
           <p className="mt-2 text-5xl font-black text-[#D4AF37] md:text-7xl">2026</p>
 
-          <div className="mt-6 flex items-center justify-center gap-4">
-            <span className="h-px w-16 bg-gradient-to-r from-transparent to-[#D4AF37]" />
-            <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#8A7A5A]">
-              SHANGHAI · CHINA · ORIENTAL SPORTS CENTER
-            </p>
-            <span className="h-px w-16 bg-gradient-to-l from-transparent to-[#D4AF37]" />
+          <div className="mt-6 flex flex-col items-center gap-2">
+            <div className="flex items-center gap-4">
+              <span className="h-px w-16 bg-gradient-to-r from-transparent to-[#D4AF37]" />
+              <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#8A7A5A]">
+                FASE DE GRUPOS EN LÍNEA · 12–16 AGO
+              </p>
+              <span className="h-px w-16 bg-gradient-to-l from-transparent to-[#D4AF37]" />
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="h-px w-8 bg-gradient-to-r from-transparent to-[rgba(212,175,55,0.4)]" />
+              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#4A3F2F]">
+                MAIN EVENT · 19–23 AGO · SHANGHAI
+              </p>
+              <span className="h-px w-8 bg-gradient-to-l from-transparent to-[rgba(212,175,55,0.4)]" />
+            </div>
+            <p className="font-mono text-[10px] text-[#D4AF37] tracking-wider">PRIZE POOL $2,905,798</p>
           </div>
 
           {/* Countdown */}
@@ -100,7 +111,7 @@ export default function Page() {
                   <span className="mt-3 font-mono text-2xl font-black text-[#D4AF37]">:</span>
                   <CountdownUnit value={seconds} label="SEG" />
                 </div>
-                <p className="mt-4 font-mono text-[10px] text-[#8A7A5A]">13 AGOSTO 2026 · 10:00 CST · FASE DE GRUPOS</p>
+                <p className="mt-4 font-mono text-[10px] text-[#8A7A5A]">13 AGOSTO 2026 · 00:00 GMT-5 · PRIMERA PARTIDA</p>
               </div>
             )}
           </div>

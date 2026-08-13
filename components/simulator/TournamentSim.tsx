@@ -332,18 +332,19 @@ function buildTI2026() {
   TI_2026_INITIAL_GROUPS.G1.forEach((n) => { initialGroupOf[byName[n]] = 'G1' })
   TI_2026_INITIAL_GROUPS.G2.forEach((n) => { initialGroupOf[byName[n]] = 'G2' })
   const prizePool = [
-    { place: '1°',  amount: '$1,234,759 USD' },
-    { place: '2°',  amount: '$377,744 USD' },
-    { place: '3°',  amount: '$261,442 USD' },
-    { place: '4°',  amount: '$174,334 USD' },
-    { place: '5–6°', amount: 'TBD' },
-    { place: '7–8°', amount: 'TBD' },
+    { place: 'Total', amount: '$2,905,798 USD' },
+    { place: '1°',    amount: 'A definir' },
+    { place: '2°',    amount: 'A definir' },
+    { place: '3°',    amount: 'A definir' },
+    { place: '4°',    amount: 'A definir' },
+    { place: '5–6°',  amount: 'A definir' },
+    { place: '7–8°',  amount: 'A definir' },
   ]
   return { id: uid(), presetKey: 'ti2026', name: 'The International 2026', teams, format: 'ti_swiss', swiss: { rounds: [round1] }, initialGroupOf, eliminationRound: null, bracket: null, prizePool }
 }
 
 const PRESETS = [
-  { key: 'ti2026', label: 'The International 2026', desc: '16 equipos · fase suiza · Shanghai · inicia 13 ago', build: buildTI2026 },
+  { key: 'ti2026', label: 'The International 2026', desc: '16 equipos · grupos en línea 12–16 ago · Main Event Shanghai 19–23 ago', build: buildTI2026 },
 ]
 
 const MANUAL_TEMPLATES = [

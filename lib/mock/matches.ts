@@ -11,26 +11,34 @@ const vis = teams.find(t => t.id === 'vis')!
 const res = teams.find(t => t.id === 'res')!
 const ts  = teams.find(t => t.id === 'ts')!
 const xg  = teams.find(t => t.id === 'xg')!
+const tl  = teams.find(t => t.id === 'tl')!
+const vg  = teams.find(t => t.id === 'vg')!
+const au  = teams.find(t => t.id === 'au')!
+const gl  = teams.find(t => t.id === 'gl')!
+const ydk = teams.find(t => t.id === 'ydk')!
+const hul = teams.find(t => t.id === 'hul')!
 
-// Group Stage Round 1 — August 13, 2026
-// All matches start at 10:00 AM CST (02:00 UTC), second block at 15:00 CST (07:00 UTC)
+// Group Stage Round 1 — August 12-13, 2026 (Online)
+// Block 1: 21:00 GMT-5 Aug 12 = 02:00 UTC Aug 13 (Group A)
+// Block 2: 00:00 GMT-5 Aug 13 = 05:00 UTC Aug 13 (Group B)
 export const matches: Match[] = [
+  // Group A
   {
     id: 'gs-r1-fal-lgd',
     radiant: fal, dire: lgd,
     radiantScore: 0, direScore: 0,
     status: 'upcoming',
-    phase: 'Fase de Grupos · Ronda 1',
+    phase: 'Fase de Grupos · Ronda 1 · Grupo A',
     format: 'BO3',
     scheduledAt: '2026-08-13T02:00:00Z',
     games: [],
   },
   {
-    id: 'gs-r1-ng-iw',
-    radiant: ng, dire: iw,
+    id: 'gs-r1-iw-ng',
+    radiant: iw, dire: ng,
     radiantScore: 0, direScore: 0,
     status: 'upcoming',
-    phase: 'Fase de Grupos · Ronda 1',
+    phase: 'Fase de Grupos · Ronda 1 · Grupo A',
     format: 'BO3',
     scheduledAt: '2026-08-13T02:00:00Z',
     games: [],
@@ -40,7 +48,7 @@ export const matches: Match[] = [
     radiant: bb, dire: og,
     radiantScore: 0, direScore: 0,
     status: 'upcoming',
-    phase: 'Fase de Grupos · Ronda 1',
+    phase: 'Fase de Grupos · Ronda 1 · Grupo A',
     format: 'BO3',
     scheduledAt: '2026-08-13T02:00:00Z',
     games: [],
@@ -50,19 +58,50 @@ export const matches: Match[] = [
     radiant: vis, dire: res,
     radiantScore: 0, direScore: 0,
     status: 'upcoming',
-    phase: 'Fase de Grupos · Ronda 1',
+    phase: 'Fase de Grupos · Ronda 1 · Grupo A',
     format: 'BO3',
     scheduledAt: '2026-08-13T02:00:00Z',
     games: [],
   },
+  // Group B
   {
     id: 'gs-r1-ts-xg',
     radiant: ts, dire: xg,
     radiantScore: 0, direScore: 0,
     status: 'upcoming',
-    phase: 'Fase de Grupos · Ronda 1',
+    phase: 'Fase de Grupos · Ronda 1 · Grupo B',
     format: 'BO3',
-    scheduledAt: '2026-08-13T07:00:00Z',
+    scheduledAt: '2026-08-13T05:00:00Z',
+    games: [],
+  },
+  {
+    id: 'gs-r1-tl-vg',
+    radiant: tl, dire: vg,
+    radiantScore: 0, direScore: 0,
+    status: 'upcoming',
+    phase: 'Fase de Grupos · Ronda 1 · Grupo B',
+    format: 'BO3',
+    scheduledAt: '2026-08-13T05:00:00Z',
+    games: [],
+  },
+  {
+    id: 'gs-r1-au-gl',
+    radiant: au, dire: gl,
+    radiantScore: 0, direScore: 0,
+    status: 'upcoming',
+    phase: 'Fase de Grupos · Ronda 1 · Grupo B',
+    format: 'BO3',
+    scheduledAt: '2026-08-13T05:00:00Z',
+    games: [],
+  },
+  {
+    id: 'gs-r1-ydk-hul',
+    radiant: ydk, dire: hul,
+    radiantScore: 0, direScore: 0,
+    status: 'upcoming',
+    phase: 'Fase de Grupos · Ronda 1 · Grupo B',
+    format: 'BO3',
+    scheduledAt: '2026-08-13T05:00:00Z',
     games: [],
   },
 ]
