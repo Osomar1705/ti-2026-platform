@@ -1,0 +1,56 @@
+{
+  "users": [
+    {
+      "username": "testuser",
+      "name": "Test",
+      "email": "test@test.com",
+      "country": "🇲🇽",
+      "bio": "",
+      "id": "57764944-e541-4561-bb36-ad2d208fff84",
+      "points": 0,
+      "correct": 0,
+      "total": 0,
+      "streak": 0,
+      "createdAt": "2026-08-12"
+    },
+    {
+      "username": "juantest",
+      "name": "Juan",
+      "email": "juan@test.com",
+      "country": "🇲🇽",
+      "bio": "",
+      "id": "ba9f1dea-d5cc-4b22-8e14-a4bc4d3ee43c",
+      "points": 0,
+      "correct": 0,
+      "total": 0,
+      "streak": 0,
+      "createdAt": "2026-08-12"
+    },
+    {
+      "username": "carlos99",
+      "name": "Carlos",
+      "email": "carlos@test.com",
+      "country": "🇦🇷",
+      "bio": "",
+      "id": "d7e1023e-8c8a-442f-8f41-8ae844baf649",
+      "points": 0,
+      "correct": 0,
+      "total": 0,
+      "streak": 0,
+      "createdAt": "2026-08-12"
+    },
+    {
+      "username": "pedro_dota",
+      "name": "Pedro",
+      "email": "pedro@test.com",
+      "country": "🇵🇪",
+      "bio": "",
+      "id": "cf03933b-eaa0-46b3-92aa-7600aee4e1a2",
+      "points": 0,
+      "correct": 0,
+      "total": 0,
+      "streak": 0,
+      "createdAt": "2026-08-12"
+    }
+  ]
+}
