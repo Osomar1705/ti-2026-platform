@@ -1,49 +1,16 @@
-// Proveedor STRATZ — transforma datos GraphQL al formato LiveMatch normalizado.
+// Proveedor STRATZ — transforma datos al formato LiveMatch normalizado.
 // La API key NUNCA sale de este archivo; vive en process.env.STRATZ_API_KEY.
 
-import type { LiveMatch, LivePlayer, LiveTeam, LiveDraftPick } from './types'
+import type { LiveMatch, LivePlayer, LiveTeam } from './types'
 import { heroName } from './hero-names'
 
-const STRATZ_URL = 'https://api.stratz.com/graphql'
-
-const QUERY = `
-query LiveMatches($leagueId: Int) {
-  live {
-    matches(request: { isParsed: false, take: 20, leagueId: $leagueId }) {
-      matchId
-      radiantScore
-      direScore
-      gameState
-      completed
-      durationValues
-      radiant { teamId name tag }
-      dire   { teamId name tag }
-      league { id displayName }
-      players {
-        steamAccountId
-        heroId
-        isRadiant
-        position
-        kills
-        deaths
-        assists
-        networth
-        level
-        numLastHits
-        numDenies
-        goldPerMinute
-        experiencePerMinute
-        item0Id item1Id item2Id item3Id item4Id item5Id
-      }
-    }
-  }
-}
-`
+// REST endpoint — más permisivo que GraphQL con Cloudflare
+const STRATZ_REST = 'https://api.stratz.com/api/v1'
 
 function parseTeam(raw: any, kills: number): LiveTeam {
   return {
     teamId: raw?.teamId ?? null,
-    name: raw?.name ?? (kills === undefined ? 'Radiant' : 'Dire'),
+    name: raw?.name ?? (kills !== undefined ? 'Radiant' : 'Dire'),
     tag: raw?.tag ?? '???',
     kills,
   }
@@ -51,7 +18,7 @@ function parseTeam(raw: any, kills: number): LiveTeam {
 
 function parsePlayers(rawPlayers: any[]): LivePlayer[] {
   if (!Array.isArray(rawPlayers)) return []
-  return rawPlayers.map((p, i) => ({
+  return rawPlayers.map((p: any, i: number) => ({
     slot: i,
     isRadiant: p.isRadiant ?? i < 5,
     heroId: p.heroId ?? 0,
@@ -59,7 +26,7 @@ function parsePlayers(rawPlayers: any[]): LivePlayer[] {
     kills: p.kills ?? 0,
     deaths: p.deaths ?? 0,
     assists: p.assists ?? 0,
-    netWorth: p.networth ?? 0,
+    netWorth: p.networth ?? p.netWorth ?? 0,
     level: p.level ?? 1,
     gpm: p.goldPerMinute ?? undefined,
     xpm: p.experiencePerMinute ?? undefined,
@@ -69,52 +36,48 @@ function parsePlayers(rawPlayers: any[]): LivePlayer[] {
   }))
 }
 
-function normalizeDuration(durationValues: number[]): number {
-  if (!Array.isArray(durationValues) || durationValues.length === 0) return 0
-  return durationValues[durationValues.length - 1] ?? 0
-}
-
-export async function fetchStratzLive(leagueId?: number): Promise<LiveMatch[]> {
+async function stratzFetch(path: string): Promise<any> {
   const apiKey = process.env.STRATZ_API_KEY
   if (!apiKey) throw new Error('STRATZ_API_KEY no configurada')
 
-  const res = await fetch(STRATZ_URL, {
-    method: 'POST',
+  const res = await fetch(`${STRATZ_REST}${path}`, {
     headers: {
       Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-      'User-Agent': 'PanchoWeb/1.0 (contact: panchoweb@proton.me)',
+      Accept: 'application/json',
     },
-    body: JSON.stringify({
-      query: QUERY,
-      variables: { leagueId: leagueId || undefined },
-    }),
-    // Cache Next.js: revalida cada 25 segundos
+    // Next.js cache: revalida cada 25s
     next: { revalidate: 25 },
   })
 
   if (!res.ok) {
-    throw new Error(`STRATZ respondió ${res.status}`)
+    const text = await res.text().catch(() => '')
+    throw new Error(`STRATZ ${res.status}: ${text.slice(0, 200)}`)
   }
 
-  const json = await res.json()
-  if (json.errors?.length) {
-    throw new Error(json.errors[0]?.message ?? 'STRATZ GraphQL error')
-  }
+  return res.json()
+}
 
-  const rawMatches: any[] = json?.data?.live?.matches ?? []
+export async function fetchStratzLive(leagueId?: number): Promise<LiveMatch[]> {
+  // STRATZ REST: /match/live devuelve partidas activas
+  const path = leagueId ? `/league/${leagueId}/matches?matchType=1` : '/match/live'
+  const data = await stratzFetch(path)
 
+  // El endpoint puede devolver un array directo o { matches: [] }
+  const rawMatches: any[] = Array.isArray(data) ? data : (data?.matches ?? data?.data ?? [])
+
+  const now = Date.now()
   return rawMatches
-    .filter((m: any) => !m.completed)
+    .filter((m: any) => !m.completed && !m.isCompleted)
+    .slice(0, 20)
     .map((m: any): LiveMatch => ({
-      matchId: String(m.matchId),
+      matchId: String(m.matchId ?? m.id ?? ''),
       status: 'LIVE',
-      duration: normalizeDuration(m.durationValues),
-      radiant: parseTeam(m.radiant, m.radiantScore ?? 0),
-      dire: parseTeam(m.dire, m.direScore ?? 0),
+      duration: m.gameTime ?? m.duration ?? m.durationValues?.at?.(-1) ?? 0,
+      radiant: parseTeam(m.radiantTeam ?? m.radiant, m.radiantScore ?? m.radiantKills ?? 0),
+      dire: parseTeam(m.direTeam ?? m.dire, m.direScore ?? m.direKills ?? 0),
       players: parsePlayers(m.players ?? []),
-      leagueId: m.league?.id,
-      leagueName: m.league?.displayName,
-      fetchedAt: Date.now(),
+      leagueId: m.leagueId ?? m.league?.id,
+      leagueName: m.league?.displayName ?? m.leagueName,
+      fetchedAt: now,
     }))
 }
