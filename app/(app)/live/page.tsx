@@ -6,7 +6,7 @@ import Link from 'next/link'
 import LiveStreamPlayer from '@/components/simulator/LiveStreamPlayer'
 
 const tournamentStreams = {
-  twitch: 'dota2ti_es',
+  twitch: 'dota2ti',
   youtube: 'nU5mLup2s7Q',
   kick: 'dotati'
 }
