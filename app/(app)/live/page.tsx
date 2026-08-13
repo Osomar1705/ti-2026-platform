@@ -5,6 +5,7 @@ import type { LiveMatch, LivePlayer } from '@/lib/live/types'
 import { Surface, SectionTitle, LiveBadge } from '@/components/shared/ui'
 import LiveStreamPlayer from '@/components/simulator/LiveStreamPlayer'
 import { ChevronRight, Radio, RefreshCw, Clock, Wifi, WifiOff } from 'lucide-react'
+import TeamLogo from '@/components/shared/TeamLogo'
 
 const tournamentStreams = {
   twitch: 'dota2ti_es',
@@ -36,6 +37,7 @@ function TeamScore({ name, tag, kills, netWorth, isRadiant }: {
   const displayName = isGeneric ? (isRadiant ? '— Radiant —' : '— Dire —') : name
   return (
     <div className="flex flex-col items-center gap-1 flex-1">
+      {!isGeneric && <TeamLogo name={name} size={48} />}
       <div style={{ fontSize: isGeneric ? 13 : 20, fontWeight: isGeneric ? 400 : 800, color: isGeneric ? '#555' : '#F5F1E8', letterSpacing: '-0.01em', textAlign: 'center', fontStyle: isGeneric ? 'italic' : 'normal' }}>
         {displayName}
       </div>

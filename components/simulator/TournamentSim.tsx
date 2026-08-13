@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import TeamLogo from '@/components/shared/TeamLogo'
 import {
   Trophy, Plus, Trash2, Users, ChevronRight, ArrowLeft, Check,
   ListTree, Layers, Swords, RefreshCw,
@@ -458,9 +459,15 @@ function Badge({ children, color }: { children: React.ReactNode; color: string }
   return <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 4, background: color + '22', color, border: `1px solid ${color}44` }}>{children}</span>
 }
 
-function TeamName({ teamsById, id }: { teamsById: Record<string, any>; id: string | null }) {
+function TeamName({ teamsById, id, logoSize = 20 }: { teamsById: Record<string, any>; id: string | null; logoSize?: number }) {
   if (!id) return <span style={{ color: C.faint, fontStyle: 'italic' }}>por definir</span>
-  return <span>{teamsById[id]?.name || '?'}</span>
+  const name = teamsById[id]?.name || '?'
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+      <TeamLogo name={name} size={logoSize} />
+      {name}
+    </span>
+  )
 }
 
 /* ------------------------------------------------------------------ */
@@ -540,7 +547,7 @@ function MatchRow({ match, teamsById, onSave, onDateChange }: any) {
     <div style={{ borderBottom: `1px solid rgba(212,175,55,0.08)`, padding: '5px 4px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
         {/* Team A */}
-        <span style={{ flex: 1, textAlign: 'right', fontWeight: aWin ? 700 : 400, color: aWin ? C.radiant : C.text }}>{nameA}</span>
+        <span style={{ flex: 1, textAlign: 'right', fontWeight: aWin ? 700 : 400, color: aWin ? C.radiant : C.text, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>{nameA}<TeamLogo name={nameA} size={20} /></span>
         
         {/* Scores - Ahora usan handleScoreChange y el max dinámico */}
         <input 
@@ -566,7 +573,7 @@ function MatchRow({ match, teamsById, onSave, onDateChange }: any) {
         />
         
         {/* Team B */}
-        <span style={{ flex: 1, fontWeight: bWin ? 700 : 400, color: bWin ? C.radiant : C.text }}>{nameB}</span>
+        <span style={{ flex: 1, fontWeight: bWin ? 700 : 400, color: bWin ? C.radiant : C.text, display: 'flex', alignItems: 'center', gap: 6 }}><TeamLogo name={nameB} size={20} />{nameB}</span>
         
         {/* Save button */}
         <button
@@ -633,7 +640,7 @@ function GroupsView({ tournament, updateTournament }: any) {
                   return (
                     <tr key={row.teamId} style={{ background: rowBg }}>
                       <td style={s.td}>{i + 1}</td>
-                      <td style={{ ...s.td, textAlign: 'left', fontWeight: 600, color: rowColor }}>{row.name}</td>
+                      <td style={{ ...s.td, textAlign: 'left', fontWeight: 600, color: rowColor }}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><TeamLogo name={row.name} size={20} />{row.name}</span></td>
                       <td style={s.td}>{row.pj}</td><td style={s.td}>{row.pg}</td><td style={s.td}>{row.pp}</td>
                       <td style={s.td}>{row.gf - row.gc > 0 ? '+' : ''}{row.gf - row.gc}</td>
                       <td style={{ ...s.td, fontWeight: 700, color: C.gold }}>{row.pts}</td>
@@ -887,7 +894,7 @@ function TIStageView({ tournament, updateTournament, setTab }: any) {
                 else { status = 'ronda de eliminación'; color = C.text }
               } else { status = 'eliminado'; color = C.dire }
             }
-            return <tr key={row.teamId}><td style={s.td}>{i + 1}</td><td style={{ ...s.td, textAlign: 'left', fontWeight: 600, color }}>{row.name}<span style={{ fontSize: 10, color: '#555', fontWeight: 400 }}>{groupLabel}</span></td><td style={s.td}>{row.wins}</td><td style={s.td}>{row.losses}</td><td style={{ ...s.td, fontSize: 11, color }}>{status || '—'}</td></tr>
+            return <tr key={row.teamId}><td style={s.td}>{i + 1}</td><td style={{ ...s.td, textAlign: 'left', fontWeight: 600, color }}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><TeamLogo name={row.name} size={20} />{row.name}</span><span style={{ fontSize: 10, color: '#555', fontWeight: 400 }}>{groupLabel}</span></td><td style={s.td}>{row.wins}</td><td style={s.td}>{row.losses}</td><td style={{ ...s.td, fontSize: 11, color }}>{status || '—'}</td></tr>
           })}
         </tbody>
       </table>
@@ -1107,7 +1114,7 @@ function GroupsSplitView({ tournament }: any) {
         {['GA', 'GB'].map((g) => (
           <div key={g} style={{ ...s.card, cursor: 'default' }}>
             <div style={{ fontWeight: 700, marginBottom: 6, color: C.gold }}>Group {g === 'GA' ? 'A' : 'B'}</div>
-            {groups[g].map((t: any) => <div key={t.id} style={{ fontSize: 13, color: C.text, padding: '2px 0' }}>{t.name}</div>)}
+            {groups[g].map((t: any) => <div key={t.id} style={{ fontSize: 13, color: C.text, padding: '2px 0', display: 'flex', alignItems: 'center', gap: 6 }}><TeamLogo name={t.name} size={20} />{t.name}</div>)}
           </div>
         ))}
       </div>

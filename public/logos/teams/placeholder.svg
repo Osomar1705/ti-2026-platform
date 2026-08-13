@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <rect width="200" height="200" rx="20" fill="#1a1a2e"/>
+  <rect x="60" y="60" width="80" height="80" rx="8" fill="none" stroke="#D4AF37" stroke-width="3"/>
+  <text x="100" y="108" font-family="Arial" font-size="24" fill="#D4AF37" text-anchor="middle">TI 2026</text>
+</svg>
