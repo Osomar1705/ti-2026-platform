@@ -17,7 +17,7 @@ const GOLD    = '#D4AF37'
 /*  Utilidades                                                           */
 /* ------------------------------------------------------------------ */
 const uid = () => Math.random().toString(36).slice(2, 10)
-const DATA_AS_OF = '10 de agosto de 2026'
+const DATA_AS_OF = '13 de agosto de 2026'
 
 const handleScoreInput = (
   currentScoreA: number,
@@ -331,11 +331,19 @@ function buildTI2026() {
   const initialGroupOf: Record<string, string> = {}
   TI_2026_INITIAL_GROUPS.G1.forEach((n) => { initialGroupOf[byName[n]] = 'G1' })
   TI_2026_INITIAL_GROUPS.G2.forEach((n) => { initialGroupOf[byName[n]] = 'G2' })
-  return { id: uid(), presetKey: 'ti2026', name: 'The International 2026', teams, format: 'ti_swiss', swiss: { rounds: [round1] }, initialGroupOf, eliminationRound: null, bracket: null }
+  const prizePool = [
+    { place: '1°',  amount: '$1,234,759 USD' },
+    { place: '2°',  amount: '$377,744 USD' },
+    { place: '3°',  amount: '$261,442 USD' },
+    { place: '4°',  amount: '$174,334 USD' },
+    { place: '5–6°', amount: 'TBD' },
+    { place: '7–8°', amount: 'TBD' },
+  ]
+  return { id: uid(), presetKey: 'ti2026', name: 'The International 2026', teams, format: 'ti_swiss', swiss: { rounds: [round1] }, initialGroupOf, eliminationRound: null, bracket: null, prizePool }
 }
 
 const PRESETS = [
-  { key: 'ti2026', label: 'The International 2026', desc: '16 equipos · fase suiza · Riad · inicia 13 ago', build: buildTI2026 },
+  { key: 'ti2026', label: 'The International 2026', desc: '16 equipos · fase suiza · Shanghai · inicia 13 ago', build: buildTI2026 },
 ]
 
 const MANUAL_TEMPLATES = [
@@ -887,7 +895,15 @@ function EliminationRoundView({ tournament, updateTournament }: any) {
   const startMainEvent = () => {
     const top3 = standings.slice(0, 3).map((s: any) => s.teamId)
     const elimWinners = tournament.eliminationRound.map((m: any) => m.scoreA > m.scoreB ? m.teamAId : m.teamBId)
-    updateTournament({ ...tournament, bracket: generateBracket([...top3, ...elimWinners]) })
+    const seeds = [...top3, ...elimWinners] // 8 teams
+    // Seeded UB Round 1 pairs: 1v8, 2v7, 3v6, 4v5
+    const round1Pairs: [string, string][] = [
+      [seeds[0], seeds[7]],
+      [seeds[1], seeds[6]],
+      [seeds[2], seeds[5]],
+      [seeds[3], seeds[4]],
+    ]
+    updateTournament({ ...tournament, bracket: generateDoubleElimN(round1Pairs) })
   }
   const elimDone = tournament.eliminationRound?.every((m: any) => m.played)
 
@@ -901,7 +917,7 @@ function EliminationRoundView({ tournament, updateTournament }: any) {
         <MatchRow key={m.id} match={m} teamsById={teamsById} onSave={(sa: number, sb: number) => setElimResult(m.id, sa, sb)} onDateChange={(date: string | null) => setElimDate(m.id, date)} />
       ))}
       {elimDone && !tournament.bracket && <button onClick={startMainEvent} style={{ ...s.primaryBtn, marginTop: 8 }}><Trophy size={16} /> Generar Main Event</button>}
-      {tournament.bracket && <div style={{ marginTop: 28 }}><BracketView bracket={tournament.bracket} teamsById={teamsById} onUpdateBracket={(b: any) => updateTournament({ ...tournament, bracket: b })} title="Main Event" /></div>}
+      {tournament.bracket && <div style={{ marginTop: 28 }}><DoubleElimBracketView bracket={tournament.bracket} teamsById={teamsById} onUpdate={(b: any) => updateTournament({ ...tournament, bracket: b })} /></div>}
     </div>
   )
 }
@@ -1107,7 +1123,7 @@ function TournamentDetail({ tournament, updateTournament, onBack, onDelete }: an
       {tournament.format === 'both' && tab === 'bracket' && tournament.bracket && <BracketView bracket={tournament.bracket} teamsById={teamsById} onUpdateBracket={(b: any) => updateTournament({ ...tournament, bracket: b })} />}
       {tournament.format === 'ti_swiss' && tab === 'groups' && <TIStageView tournament={tournament} updateTournament={updateTournament} />}
       {tournament.format === 'ti_swiss' && tab === 'elimination' && <EliminationRoundView tournament={tournament} updateTournament={updateTournament} />}
-      {tournament.format === 'ti_swiss' && tab === 'bracket' && tournament.bracket && <BracketView bracket={tournament.bracket} teamsById={teamsById} onUpdateBracket={(b: any) => updateTournament({ ...tournament, bracket: b })} title="Main Event" />}
+      {tournament.format === 'ti_swiss' && tab === 'bracket' && tournament.bracket && <DoubleElimBracketView bracket={tournament.bracket} teamsById={teamsById} onUpdate={(b: any) => updateTournament({ ...tournament, bracket: b })} />}
       {tab === 'rosters' && <RostersView tournament={tournament} />}
       {tab === 'prizepool' && tournament.prizePool && <PrizePoolView prizePool={tournament.prizePool} />}
       {tab === 'swissgroups' && tournament.format === 'ti_swiss' && <GroupsSplitView tournament={tournament} />}
