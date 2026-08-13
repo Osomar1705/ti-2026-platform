@@ -42,6 +42,17 @@ function parsePlayers(rawPlayers: any[]): LivePlayer[] {
   }))
 }
 
+export async function getDebugLeagueIds(): Promise<{ id: number; count: number }[]> {
+  const res = await fetch(OPENDOTA_URL, { headers: { Accept: 'application/json' } })
+  if (!res.ok) return []
+  const raw: any[] = await res.json()
+  const counts: Record<number, number> = {}
+  raw.forEach((m: any) => { counts[m.league_id] = (counts[m.league_id] ?? 0) + 1 })
+  return Object.entries(counts)
+    .map(([id, count]) => ({ id: Number(id), count }))
+    .sort((a, b) => b.id - a.id)
+}
+
 export async function fetchStratzLive(leagueId?: number): Promise<LiveMatch[]> {
   const res = await fetch(OPENDOTA_URL, {
     headers: { Accept: 'application/json' },
@@ -51,10 +62,6 @@ export async function fetchStratzLive(leagueId?: number): Promise<LiveMatch[]> {
   if (!res.ok) throw new Error(`OpenDota ${res.status}`)
 
   const rawMatches: any[] = await res.json()
-
-  // Log para debug: ver qué league_ids hay en los matches actuales
-  const leagueIds = [...new Set(rawMatches.map((m: any) => m.league_id))]
-  console.log('[live] league_ids activos:', leagueIds)
 
   const now = Date.now()
 
