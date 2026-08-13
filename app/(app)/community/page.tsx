@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Surface, SectionTitle } from '@/components/shared/ui'
 import type { Post } from '@/lib/types'
 import { ChevronRight, Heart, MessageCircle, Send, Users } from 'lucide-react'
@@ -16,8 +16,22 @@ const ROOMS = [
 export default function CommunityPage() {
   const { user } = useUser()
   const [room, setRoom] = useState('general')
-  const [posts, setPosts] = useState<Post[]>([])
-  const [liked, setLiked] = useState<string[]>([])
+  const [posts, setPosts] = useState<Post[]>(() => {
+    if (typeof window === 'undefined') return []
+    try { return JSON.parse(localStorage.getItem('community_posts') || '[]') } catch { return [] }
+  })
+  const [liked, setLiked] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return []
+    try { return JSON.parse(localStorage.getItem('community_liked') || '[]') } catch { return [] }
+  })
+
+  useEffect(() => {
+    localStorage.setItem('community_posts', JSON.stringify(posts))
+  }, [posts])
+
+  useEffect(() => {
+    localStorage.setItem('community_liked', JSON.stringify(liked))
+  }, [liked])
   const [newPost, setNewPost] = useState('')
 
   const filtered = posts.filter((p) => p.room === room || room === 'general')
