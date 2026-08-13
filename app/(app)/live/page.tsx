@@ -88,8 +88,8 @@ function MatchCard({ match }: { match: LiveMatch }) {
       <div style={{ padding: '12px 20px', background: 'rgba(212,175,55,0.06)', borderBottom: '1px solid rgba(212,175,55,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <LiveBadge />
-          <span style={{ fontSize: 12, color: '#8A7A5A' }}>{match.leagueName ?? 'Dota 2'}</span>
-          {match.seriesType && <span style={{ fontSize: 11, background: 'rgba(212,175,55,0.12)', color: '#D4AF37', padding: '2px 8px', borderRadius: 4, fontWeight: 600 }}>{match.seriesType}</span>}
+          <span style={{ fontSize: 12, color: '#D4AF37', fontWeight: 700, fontFamily: 'monospace', letterSpacing: '0.08em' }}>TI 2026</span>
+          <span style={{ fontSize: 11, color: '#8A7A5A' }}>· Fase de Grupos</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'monospace', fontSize: 13, color: '#D4AF37', fontWeight: 700 }}>
           <Clock size={14} />
