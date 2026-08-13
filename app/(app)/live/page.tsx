@@ -15,6 +15,7 @@ const tournamentStreams = {
 // ─── helpers ───────────────────────────────────────────────────────────────
 
 function fmtDuration(secs: number): string {
+  if (secs < 0) return 'Pre-game'
   const m = Math.floor(secs / 60)
   const s = secs % 60
   return `${m}:${String(s).padStart(2, '0')}`
@@ -47,23 +48,18 @@ function TeamScore({ name, tag, kills, netWorth, isRadiant }: {
   )
 }
 
-function PlayerRow({ p, isEven }: { p: LivePlayer; isEven: boolean }) {
-  const kda = p.deaths === 0
-    ? `${p.kills}/${p.deaths}/${p.assists}`
-    : `${p.kills}/${p.deaths}/${p.assists}`
+function PlayerRow({ p, isEven, hideKDA }: { p: LivePlayer; isEven: boolean; hideKDA?: boolean }) {
   const color = p.isRadiant ? '#4ADE80' : '#F87171'
-
   return (
     <tr style={{ background: isEven ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
       <td style={{ padding: '6px 8px', fontSize: 12, color, fontWeight: 600, whiteSpace: 'nowrap' }}>
         {p.heroName}
       </td>
-      <td style={{ padding: '6px 8px', fontFamily: 'monospace', fontSize: 12, color: '#F5F1E8', textAlign: 'center' }}>
-        {kda}
-      </td>
-      <td style={{ padding: '6px 8px', fontFamily: 'monospace', fontSize: 12, color: '#D4AF37', textAlign: 'right' }}>
-        {fmtGold(p.netWorth)}
-      </td>
+      {!hideKDA && (
+        <td style={{ padding: '6px 8px', fontFamily: 'monospace', fontSize: 12, color: '#F5F1E8', textAlign: 'center' }}>
+          {p.kills}/{p.deaths}/{p.assists}
+        </td>
+      )}
       <td style={{ padding: '6px 8px', fontFamily: 'monospace', fontSize: 11, color: '#8A7A5A', textAlign: 'center' }}>
         {p.level}
       </td>
@@ -148,27 +144,39 @@ function MatchCard({ match }: { match: LiveMatch }) {
       )}
 
       {/* Players */}
-      {match.players.length > 0 && (
-        <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.06)', overflowX: 'auto' }}>
-          <div style={{ fontSize: 11, color: '#8A7A5A', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Jugadores</div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 320 }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                <th style={{ padding: '4px 8px', textAlign: 'left',   fontSize: 10, color: '#8A7A5A', fontWeight: 500 }}>Héroe</th>
-                <th style={{ padding: '4px 8px', textAlign: 'center', fontSize: 10, color: '#8A7A5A', fontWeight: 500 }}>K/D/A</th>
-                <th style={{ padding: '4px 8px', textAlign: 'right',  fontSize: 10, color: '#8A7A5A', fontWeight: 500 }}>NW</th>
-                <th style={{ padding: '4px 8px', textAlign: 'center', fontSize: 10, color: '#8A7A5A', fontWeight: 500 }}>Nv.</th>
-                {hasGpm && <th style={{ padding: '4px 8px', textAlign: 'right', fontSize: 10, color: '#8A7A5A', fontWeight: 500 }}>GPM</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {radiantPlayers.map((p, i) => <PlayerRow key={p.slot} p={p} isEven={i % 2 === 0} />)}
-              <tr><td colSpan={hasGpm ? 5 : 4} style={{ height: 8 }} /></tr>
-              {direPlayers.map((p, i) => <PlayerRow key={p.slot} p={p} isEven={i % 2 === 0} />)}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {(() => {
+        const knownPlayers = match.players.filter(p => p.heroId !== 0)
+        const inDraft = knownPlayers.length === 0 && match.players.length > 0
+        if (match.players.length === 0) return null
+        if (inDraft) return (
+          <div style={{ padding: '12px 20px', borderTop: '1px solid rgba(255,255,255,0.06)', textAlign: 'center', fontSize: 12, color: '#8A7A5A', fontStyle: 'italic' }}>
+            En fase de draft — héroes pendientes
+          </div>
+        )
+        const rPlayers = knownPlayers.filter(p => p.isRadiant)
+        const dPlayers = knownPlayers.filter(p => !p.isRadiant)
+        const allZeroKDA = knownPlayers.every(p => p.kills === 0 && p.deaths === 0 && p.assists === 0)
+        return (
+          <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.06)', overflowX: 'auto' }}>
+            <div style={{ fontSize: 11, color: '#8A7A5A', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Jugadores</div>
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 280 }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                  <th style={{ padding: '4px 8px', textAlign: 'left',   fontSize: 10, color: '#8A7A5A', fontWeight: 500 }}>Héroe</th>
+                  {!allZeroKDA && <th style={{ padding: '4px 8px', textAlign: 'center', fontSize: 10, color: '#8A7A5A', fontWeight: 500 }}>K/D/A</th>}
+                  <th style={{ padding: '4px 8px', textAlign: 'center', fontSize: 10, color: '#8A7A5A', fontWeight: 500 }}>Nv.</th>
+                  {hasGpm && <th style={{ padding: '4px 8px', textAlign: 'right', fontSize: 10, color: '#8A7A5A', fontWeight: 500 }}>GPM</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {rPlayers.map((p, i) => <PlayerRow key={p.slot} p={p} isEven={i % 2 === 0} hideKDA={allZeroKDA} />)}
+                <tr><td colSpan={4} style={{ height: 8 }} /></tr>
+                {dPlayers.map((p, i) => <PlayerRow key={p.slot} p={p} isEven={i % 2 === 0} hideKDA={allZeroKDA} />)}
+              </tbody>
+            </table>
+          </div>
+        )
+      })()}
     </div>
   )
 }
